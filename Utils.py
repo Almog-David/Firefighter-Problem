@@ -3,10 +3,10 @@ import networkx as nx
 def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
     return 0
 
-def calculate_epsilon(direct_vacinations:dict)->list:
+def calculate_epsilon(direct_vaccinations:dict)->list:
     return 0
 
-def find_best_direct_vaccination(direct_vacinations:dict, current_time_options:list, targets:list)->tuple:
+def find_best_direct_vaccination(direct_vaccinations:dict, current_time_options:list, targets:list)->tuple:
     return 0
 
 def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
