@@ -5,11 +5,31 @@ node_colors = {
     'target': 'gray',
     'infected': 'red',
     'vaccinated': 'blue',
-    'directly_vaccinated': 'green',
+    'directly vaccinated': 'green',
 }
 
 def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
-    return 0
+    gamma = {}
+    direct_vaccination = {}
+    path_length = dict(nx.all_pairs_shortest_path_length(graph))
+    for key in graph.nodes:
+        vaccination_options = []
+        for node in graph.nodes:
+                if path_length[source].get(key) is not None and path_length[node].get(key) is not None:
+                    s_to_v = path_length[source].get(key)
+                    u_to_v = path_length[node].get(key)
+                    max_time = s_to_v - u_to_v
+                    if max_time > 0:
+                        for i in range(1,max_time+1):
+                            option = (node,i)
+                            vaccination_options.append(option)
+                            if option not in direct_vaccination:
+                                direct_vaccination[option] = []
+                            if key in targets:
+                                direct_vaccination[option].append(key)
+        gamma[key] = vaccination_options
+
+    return gamma, direct_vaccination
 
 def calculate_epsilon(direct_vaccinations:dict)->list:
     epsilon = []
@@ -32,8 +52,24 @@ def calculate_epsilon(direct_vaccinations:dict)->list:
 
     return epsilon
 
-def find_best_direct_vaccination(direct_vaccinations:dict, current_time_options:list, targets:list)->tuple:
-    return 0
+def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, current_time_options:list, targets:list)->tuple:
+    best_vaccination = () 
+    nodes_saved = {}
+    common_elements = None
+    max_number = 0
+    for option in current_time_options:
+        if(graph.nodes[option[0]]['status'] == 'target'):
+            nodes_list = direct_vaccinations.get(option)
+            common_elements = set(nodes_list) & set(targets)
+            if len(common_elements) > max_number:
+                best_vaccination = option
+                nodes_saved = common_elements
+                max_number = len(common_elements)
+
+    if common_elements is not None:
+        targets[:] = [element for element in targets if element not in common_elements]
+    return best_vaccination
+
 
 def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
     new_infected_nodes = []
@@ -70,6 +106,3 @@ def display_graph(graph:nx.DiGraph)->None:
     nx.draw(graph, pos, node_color=colors, with_labels=True, font_weight='bold')
     plt.show()
     return
-
-
-if __name__ == "__main__":
