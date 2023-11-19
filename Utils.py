@@ -56,7 +56,7 @@ def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, cur
     best_vaccination = () 
     nodes_saved = {}
     common_elements = None
-    max_number = 0
+    max_number = -1
     for option in current_time_options:
         if(graph.nodes[option[0]]['status'] == 'target'):
             nodes_list = direct_vaccinations.get(option)
@@ -67,7 +67,7 @@ def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, cur
                 max_number = len(common_elements)
 
     if common_elements is not None:
-        targets[:] = [element for element in targets if element not in common_elements]
+        targets[:] = [element for element in targets if element not in nodes_saved]
     return best_vaccination
 
 
@@ -99,6 +99,12 @@ def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
 def vaccinate_node(graph:nx.DiGraph, node:int)->None:
     graph.nodes[node]['status'] = 'directly vaccinated'
     return
+
+def clean_graph(graph:nx.DiGraph)->None:
+    for node in graph.nodes:
+        graph.nodes[node]['status'] = 'target'
+    return
+
 
 def display_graph(graph:nx.DiGraph)->None:
     colors = [node_colors[data['status']] for node, data in graph.nodes(data=True)]

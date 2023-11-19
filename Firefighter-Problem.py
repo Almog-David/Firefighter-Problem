@@ -1,5 +1,6 @@
 import networkx as nx
 from Utils import *
+import math
 
 """
 Examples of graphs that we will use in the following runing examples:
@@ -39,25 +40,26 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
     can_spread = True
     Graph.nodes[source]['status'] = 'infected'
     infected_nodes.append(source)
-    display_graph(Graph)
+    #display_graph(Graph)
     gamma, direct_vaccinations = calculate_gamma(Graph, source, targets)
     epsilon = calculate_epsilon(direct_vaccinations)
+    time_step = 0
     while(can_spread):
-        time_step = 0
         spread_vaccination(Graph, vaccinated_nodes)
-        display_graph(Graph)
+        #display_graph(Graph)
         for i in range(budget):
             vaccination = find_best_direct_vaccination(Graph,direct_vaccinations,epsilon[time_step],targets)
             if vaccination != ():
                 vaccination_strategy.append(vaccination)
                 chosen_node = vaccination[0]
                 vaccinate_node(Graph, chosen_node)
-                display_graph(Graph)
+                #display_graph(Graph)
                 vaccinated_nodes.append(chosen_node)
         can_spread = spread_virus(Graph,infected_nodes)
-        display_graph(Graph)
+        #display_graph(Graph)
         time_step = time_step + 1
     
+    clean_graph(Graph)
     return vaccination_strategy
 
 def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
@@ -79,7 +81,33 @@ def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
     >>> spreading_minbudget(G2,0,G2.nodes())
     3
     """
-    return 0
+    original_targets = list(targets)
+    direct_vaccinations = calculate_gamma(Graph, source, targets)[1]
+    min_value = 1
+    max_value = len(targets)
+    middle = math.floor((min_value + max_value) / 2)
+    answer = middle
+
+    while min_value < max_value:
+        strategy = spreading_maxsave(Graph, middle, source, targets)
+        nodes_saved = set()
+
+        for option in strategy:
+            list_of_nodes = direct_vaccinations.get(option)
+            nodes_saved.update(list_of_nodes)
+
+        common_elements = set(nodes_saved) & set(original_targets)
+
+        if len(common_elements) == len(original_targets):
+            max_value = middle
+            answer = middle
+        else:
+            min_value = middle + 1
+
+        middle = math.floor((min_value + max_value) / 2)
+        targets = list(original_targets)
+
+    return answer
     
 def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     """
@@ -107,7 +135,6 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     """
     return 0
 
-
 if __name__ == "__main__":
     G2 = nx.DiGraph()
     G2.add_node(0, status = 'target')
@@ -117,7 +144,9 @@ if __name__ == "__main__":
     G2.add_node(4, status = 'target')
     G2.add_node(5, status = 'target')
     G2.add_node(6, status = 'target')
-    G2.add_edges_from([(0,1),(0,2),(1,3),(2,3),(1,4),(2,6),(3,5)])
-    strategy = spreading_maxsave(G2,1, 0, [1,2,3,4,5,6])
-    print(strategy)
+    G2.add_node(7, status = 'target')
+    G2.add_node(8, status = 'target')
+    G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
+    ans = spreading_maxsave(G2,2, 0, [1,2,3,4,5,6,7,8])
+    print(ans)
    
