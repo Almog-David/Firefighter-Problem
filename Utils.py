@@ -12,7 +12,25 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
     return 0
 
 def calculate_epsilon(direct_vaccinations:dict)->list:
-    return 0
+    epsilon = []
+    sorted_dict = dict(sorted(direct_vaccinations.items(), key=lambda item: item[0][1]))
+
+    # Iterate over the sorted dictionary and populate the result list
+    current_time_step = None
+    current_group = []
+    for key, value in sorted_dict.items():
+        if current_time_step is None or key[1] == current_time_step:
+            current_group.append(key)
+        else:
+            epsilon.append(current_group)
+            current_group = [key]
+        current_time_step = key[1]
+
+    # Append the last group
+    if current_group:
+        epsilon.append(current_group)
+
+    return epsilon
 
 def find_best_direct_vaccination(direct_vaccinations:dict, current_time_options:list, targets:list)->tuple:
     return 0
@@ -48,7 +66,7 @@ def vaccinate_node(graph:nx.DiGraph, node:int)->None:
 
 def display_graph(graph:nx.DiGraph)->None:
     colors = [node_colors[data['status']] for node, data in graph.nodes(data=True)]
-    pos = nx.shell_layout(graph)
+    pos = nx.spectral_layout(graph)
     nx.draw(graph, pos, node_color=colors, with_labels=True, font_weight='bold')
     plt.show()
     return
