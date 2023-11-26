@@ -139,8 +139,7 @@ def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
     for edge in graph.edges:
         H.add_edge(f'{edge[0]}_out', f'{edge[1]}_in', weight=float('inf'))
     display_graph(H)
-    # the return is giving a different result then expected 
-    return algo.minimum_st_edge_cut(H,f'{source}_in','t_out')
+    return algo.minimum_st_edge_cut(H,f'{source}_out','t_in')
     
 
 
