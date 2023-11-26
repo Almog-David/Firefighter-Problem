@@ -1,4 +1,5 @@
 import networkx as nx
+import networkx.algorithms.connectivity as algo 
 import matplotlib.pyplot as plt
 import copy
 
@@ -7,6 +8,7 @@ node_colors = {
     'infected': 'red',
     'vaccinated': 'blue',
     'directly vaccinated': 'green',
+    'default' : "#00FFD0"
 }
 
 def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
@@ -108,9 +110,13 @@ def clean_graph(graph:nx.DiGraph)->None:
 
 
 def display_graph(graph:nx.DiGraph)->None:
-    colors = [node_colors[data['status']] for node, data in graph.nodes(data=True)]
-    pos = nx.spectral_layout(graph)
+    pos = nx.shell_layout(graph)
+    colors = [node_colors.get(data.get('status', 'default'), 'default') for node, data in graph.nodes(data=True)]
     nx.draw(graph, pos, node_color=colors, with_labels=True, font_weight='bold')
+    
+    if nx.get_edge_attributes(graph, 'weight'):
+        edge_labels = nx.get_edge_attributes(graph, 'weight')
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
     plt.show()
     return
 
@@ -121,3 +127,33 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
         G.add_edge(node,'t')
     return G
 
+def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
+    H = nx.DiGraph()
+    for node in graph.nodes:
+        in_node, out_node = f'{node}_in', f'{node}_out'
+        H.add_nodes_from([in_node, out_node])
+        if node == source or node == 't':
+            H.add_edge(in_node, out_node, weight=float('inf'))
+        else:
+            H.add_edge(in_node, out_node, weight=graph.nodes[node]['weight'])
+    for edge in graph.edges:
+        H.add_edge(f'{edge[0]}_out', f'{edge[1]}_in', weight=float('inf'))
+    display_graph(H)
+    # the return is giving a different result then expected 
+    return algo.minimum_st_edge_cut(H,f'{source}_in','t_out')
+    
+
+
+if __name__ == "__main__":
+    G2 = nx.DiGraph()
+    G2.add_node(0, status = 'target', weight = 1)
+    G2.add_node(1, status = 'target', weight = 2)
+    G2.add_node(2, status = 'target', weight = 2)
+    G2.add_node(3, status = 'target', weight = 3)
+    G2.add_node(4, status = 'target', weight = 3)
+    G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(2,3),(2,4)])
+    H = create_st_graph(G2, [1,2,3,4])
+    print(graph_flow_reduction(H,0))
+    #print(list(nx.bfs_layers(G2,0)))
+    
+        
