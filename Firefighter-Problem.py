@@ -2,7 +2,6 @@ import networkx as nx
 import networkx.algorithms.connectivity as algo 
 from Utils import *
 import math
-import copy
 
 """
 Examples of graphs that we will use in the following runing examples:
@@ -88,7 +87,6 @@ def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
     min_value = 1
     max_value = len(targets)
     middle = math.floor((min_value + max_value) / 2)
-    answer = middle
 
     while min_value < max_value:
         strategy = spreading_maxsave(Graph, middle, source, targets)
@@ -102,14 +100,13 @@ def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
 
         if len(common_elements) == len(original_targets):
             max_value = middle
-            answer = middle
         else:
             min_value = middle + 1
 
         middle = math.floor((min_value + max_value) / 2)
         targets = list(original_targets)
 
-    return answer
+    return middle
     
 def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     """
@@ -121,11 +118,17 @@ def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
 
     non_spreading_minbudget: Gets a directed graph, source node, and list of targeted nodes that we need to save
     and returns the minimum budget that saves all the nodes from the targeted nodes list.
+    
+    Example1:
+    >>> non_spreading_minbudget(G2,0,[2,6,1,8])
+    3
+
+    Example2:
+    >>> non_spreading_minbudget(G1,0,G1.nodes())
+    2
     """
-    G = copy.deepcopy(Graph)
-    G.add_node('t', status = 'target')
-    for node in targets:
-        G.add_edge(node,'t')
+
+    G = create_st_graph(Graph,targets)
     #display_graph(G)
     return len(algo.minimum_st_node_cut(G,source,'t'))
 
@@ -151,8 +154,6 @@ if __name__ == "__main__":
     G2.add_node(4, status = 'target')
     G2.add_node(5, status = 'target')
     G2.add_node(6, status = 'target')
-    G2.add_node(7, status = 'target')
-    G2.add_node(8, status = 'target')
-    G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
-    print(non_spreading_minbudget(G2,0,[1,2,6,8]))
-   
+    G2.add_edges_from([(0,1),(0,2),(1,2),(1,4),(2,3),(2,6),(3,5)])
+    print(non_spreading_minbudget(G2, 0, [1,3,5]))
+    #print(list(nx.bfs_layers(G2,0)))

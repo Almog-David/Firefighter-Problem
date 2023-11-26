@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import copy
 
 node_colors = {
     'target': 'gray',
@@ -112,3 +113,11 @@ def display_graph(graph:nx.DiGraph)->None:
     nx.draw(graph, pos, node_color=colors, with_labels=True, font_weight='bold')
     plt.show()
     return
+
+def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
+    G = copy.deepcopy(graph)
+    G.add_node('t', status = 'target')
+    for node in targets:
+        G.add_edge(node,'t')
+    return G
+
