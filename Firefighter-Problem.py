@@ -1,6 +1,8 @@
 import networkx as nx
+import networkx.algorithms.connectivity as algo 
 from Utils import *
 import math
+import copy
 
 """
 Examples of graphs that we will use in the following runing examples:
@@ -120,7 +122,12 @@ def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     non_spreading_minbudget: Gets a directed graph, source node, and list of targeted nodes that we need to save
     and returns the minimum budget that saves all the nodes from the targeted nodes list.
     """
-    return 0
+    G = copy.deepcopy(Graph)
+    G.add_node('t', status = 'target')
+    for node in targets:
+        G.add_edge(node,'t')
+    #display_graph(G)
+    return len(algo.minimum_st_node_cut(G,source,'t'))
 
 def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     """
@@ -147,6 +154,5 @@ if __name__ == "__main__":
     G2.add_node(7, status = 'target')
     G2.add_node(8, status = 'target')
     G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
-    ans = spreading_maxsave(G2,2, 0, [1,2,3,4,5,6,7,8])
-    print(ans)
+    print(non_spreading_minbudget(G2,0,[1,2,6,8]))
    
