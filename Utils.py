@@ -1,6 +1,7 @@
 import networkx as nx
 import networkx.algorithms.connectivity as algo 
 import matplotlib.pyplot as plt
+import numpy as np
 import copy
 
 node_colors = {
@@ -115,7 +116,6 @@ def clean_graph(graph:nx.DiGraph)->None:
         graph.nodes[node]['status'] = 'target'
     return
 
-
 def display_graph(graph:nx.DiGraph)->None:
     pos = nx.shell_layout(graph)
     colors = [node_colors.get(data.get('status', 'default'), 'default') for node, data in graph.nodes(data=True)]
@@ -126,6 +126,17 @@ def display_graph(graph:nx.DiGraph)->None:
         nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
     plt.show()
     return
+
+""" adjust the nodes capacity based on the formula in the article at the DirLayNet algorithm section. """
+def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
+    layers = (list(nx.bfs_layers(graph,source)))
+    harmonic_sum = 0.0
+    for i in range(1,len(layers)):
+        harmonic_sum = harmonic_sum + 1/i
+    for index in range(1,len(layers)):
+        for node in layers[index]:
+            graph.nodes[node]['capacity'] = 1/(index*harmonic_sum)       
+    return layers
 
 """ create a st graph from the original graph in order to use connectivity algorithms. """
 def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
@@ -144,13 +155,27 @@ def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
         if node == source or node == 't':
             H.add_edge(in_node, out_node, weight=float('inf'))
         else:
-            H.add_edge(in_node, out_node, weight=graph.nodes[node]['weight'])
+            H.add_edge(in_node, out_node, weight=graph.nodes[node]['capacity'])
     for edge in graph.edges:
         H.add_edge(f'{edge[0]}_out', f'{edge[1]}_in', weight=float('inf'))
     display_graph(H)
     return algo.minimum_st_edge_cut(H,f'{source}_out','t_in')
-    
 
+""" calculate the vaccine matrix based on the calculation in the article at the DirLayNet algorithm section.
+the function returns the minimum budget according to the matrix calculation. """
+def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
+    nodes_list = []
+    for i in range(1,len(layers)):
+        common_elements = set(min_cut_nodes) & set(layers[i])
+        nodes_list.append(common_elements)
+    print(nodes_list)
+    matrix = np.zeros((len(layers)-1, len(layers)-1))
+    for i in range (len(layers)-1):
+        for j in range(len(layers)-1):
+            matrix[i][j] = len(nodes_list[j])/(j+1)
+    # the matrix is returning a wrong answer - need to check how to fix it! 
+    print(matrix)
+    return
 
 if __name__ == "__main__":
     G2 = nx.DiGraph()
@@ -160,8 +185,7 @@ if __name__ == "__main__":
     G2.add_node(3, status = 'target', weight = 3)
     G2.add_node(4, status = 'target', weight = 3)
     G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(2,3),(2,4)])
-    H = create_st_graph(G2, [1,2,3,4])
-    print(graph_flow_reduction(H,0))
-    #print(list(nx.bfs_layers(G2,0)))
+    adjust_nodes_capacity(G2, 0)
+    calculate_vaccine_matrix([[0], [1, 2], [3, 4]], [1,2])
     
         
