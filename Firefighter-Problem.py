@@ -127,7 +127,6 @@ def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     >>> non_spreading_minbudget(G1,0,G1.nodes())
     2
     """
-
     G = create_st_graph(Graph,targets)
     #display_graph(G)
     return len(algo.minimum_st_node_cut(G,source,'t'))
@@ -143,7 +142,11 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     non_spreading_dirlaynet_minbudget: Gets a directed graph, source node, and list of targeted nodes that we need to save
     and returns the minimum budget that saves all the nodes from the targeted nodes list.
     """
-    return 0
+    layers = adjust_nodes_capacity(Graph, source)
+    G = create_st_graph(Graph, targets)
+    min_cut_edges = graph_flow_reduction(G,source)
+    min_cut_nodes = {int(item[0].split('_')[0]) for item in min_cut_edges} | {int(item[1].split('_')[0]) for item in min_cut_edges}
+    return calculate_vaccine_matrix(layers,min_cut_nodes)
 
 if __name__ == "__main__":
     G2 = nx.DiGraph()
@@ -152,8 +155,6 @@ if __name__ == "__main__":
     G2.add_node(2, status = 'target')
     G2.add_node(3, status = 'target')
     G2.add_node(4, status = 'target')
-    G2.add_node(5, status = 'target')
-    G2.add_node(6, status = 'target')
-    G2.add_edges_from([(0,1),(0,2),(1,2),(1,4),(2,3),(2,6),(3,5)])
-    print(non_spreading_minbudget(G2, 0, [1,3,5]))
+    G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(2,3),(2,4)])
+    non_spreading_dirlaynet_minbudget(G2, 0, [1,2,3,4])
     #print(list(nx.bfs_layers(G2,0)))

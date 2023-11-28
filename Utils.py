@@ -171,9 +171,8 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
     print(nodes_list)
     matrix = np.zeros((len(layers)-1, len(layers)-1))
     for i in range (len(layers)-1):
-        for j in range(len(layers)-1):
-            if i <= j:
-                matrix[i][j] = len(nodes_list[j])/(j+1)
+        for j in range(i, len(layers)-1):
+            matrix[i][j] = len(nodes_list[j])/(j+1)
     print(matrix)
     return
 
@@ -186,6 +185,6 @@ if __name__ == "__main__":
     G2.add_node(4, status = 'target', weight = 3)
     G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(2,3),(2,4)])
     adjust_nodes_capacity(G2, 0)
-    calculate_vaccine_matrix([[0], [1, 2], [3, 4]], [1,2])
+    calculate_vaccine_matrix([[0], [1, 2], [3, 4]], [1,4])
     
         
