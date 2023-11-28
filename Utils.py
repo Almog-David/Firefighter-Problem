@@ -11,6 +11,8 @@ node_colors = {
     'default' : "#00FFD0"
 }
 
+""" Calculate Gamma and S(u,t) based on the calculation in the article. 
+In our implementation, Gamma = gamma and S(u,t) = direct_vaccination. """
 def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
     gamma = {}
     direct_vaccination = {}
@@ -34,6 +36,7 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
 
     return gamma, direct_vaccination
 
+""" Calculate Epsilon based on the calculation in the article. """
 def calculate_epsilon(direct_vaccinations:dict)->list:
     epsilon = []
     sorted_dict = dict(sorted(direct_vaccinations.items(), key=lambda item: item[0][1]))
@@ -55,6 +58,8 @@ def calculate_epsilon(direct_vaccinations:dict)->list:
 
     return epsilon
 
+""" find the best direct vaccination in the current time step that saves more new node in targets.
+current_time_options is a list of all the direct vaccination options in the current time step. """
 def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, current_time_options:list, targets:list)->tuple:
     best_vaccination = () 
     nodes_saved = {}
@@ -73,7 +78,7 @@ def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, cur
         targets[:] = [element for element in targets if element not in nodes_saved]
     return best_vaccination
 
-
+""" spread the virus on the graph from the infected nodes. """
 def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
     new_infected_nodes = []
     for node in infected_nodes:
@@ -87,6 +92,7 @@ def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
 
     return bool(infected_nodes)
 
+""" spread the vaccination on the graph from the vaccinated nodes. """
 def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
     new_vaccinated_nodes = []
     for node in vaccinated_nodes:
@@ -99,6 +105,7 @@ def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
         vaccinated_nodes.append(node)            
     return
 
+""" directly vaccinate a specific node on the graph. """
 def vaccinate_node(graph:nx.DiGraph, node:int)->None:
     graph.nodes[node]['status'] = 'directly vaccinated'
     return
@@ -120,6 +127,7 @@ def display_graph(graph:nx.DiGraph)->None:
     plt.show()
     return
 
+""" create a st graph from the original graph in order to use connectivity algorithms. """
 def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
     G = copy.deepcopy(graph)
     G.add_node('t', status = 'target')
@@ -127,6 +135,7 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
         G.add_edge(node,'t')
     return G
 
+"""" flow reduction to the original st graph in order to find min st cut based on the information in the article.  """
 def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
     H = nx.DiGraph()
     for node in graph.nodes:
