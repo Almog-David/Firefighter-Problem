@@ -172,8 +172,8 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
     matrix = np.zeros((len(layers)-1, len(layers)-1))
     for i in range (len(layers)-1):
         for j in range(len(layers)-1):
-            matrix[i][j] = len(nodes_list[j])/(j+1)
-    # the matrix is returning a wrong answer - need to check how to fix it! 
+            if i <= j:
+                matrix[i][j] = len(nodes_list[j])/(j+1)
     print(matrix)
     return
 
