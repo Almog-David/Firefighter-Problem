@@ -145,7 +145,7 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     layers = adjust_nodes_capacity(Graph, source)
     G = create_st_graph(Graph, targets)
     min_cut_nodes = graph_flow_reduction(G,source)
-    min_cut_nodes = {int(item[0].split('_')[0]) for item in min_cut_nodes}
+    min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
     return calculate_vaccine_matrix(layers,min_cut_nodes)
 
 if __name__ == "__main__":
