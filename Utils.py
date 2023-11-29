@@ -2,6 +2,7 @@ import networkx as nx
 import networkx.algorithms.connectivity as algo 
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 import copy
 
 node_colors = {
@@ -11,6 +12,8 @@ node_colors = {
     'directly vaccinated': 'green',
     'default' : "#00FFD0"
 }
+
+"Spreading:"
 
 """ Calculate Gamma and S(u,t) based on the calculation in the article. 
 In our implementation, Gamma = gamma and S(u,t) = direct_vaccination. """
@@ -111,21 +114,13 @@ def vaccinate_node(graph:nx.DiGraph, node:int)->None:
     graph.nodes[node]['status'] = 'directly vaccinated'
     return
 
+"Simple method to clean the graph and return it to its base state"
 def clean_graph(graph:nx.DiGraph)->None:
     for node in graph.nodes:
         graph.nodes[node]['status'] = 'target'
     return
 
-def display_graph(graph:nx.DiGraph)->None:
-    pos = nx.shell_layout(graph)
-    colors = [node_colors.get(data.get('status', 'default'), 'default') for node, data in graph.nodes(data=True)]
-    nx.draw(graph, pos, node_color=colors, with_labels=True, font_weight='bold')
-    
-    if nx.get_edge_attributes(graph, 'weight'):
-        edge_labels = nx.get_edge_attributes(graph, 'weight')
-        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
-    plt.show()
-    return
+"NoN-Spreading:"
 
 """ adjust the nodes capacity based on the formula in the article at the DirLayNet algorithm section. """
 def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
@@ -138,7 +133,7 @@ def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
             graph.nodes[node]['capacity'] = 1/(index*harmonic_sum)       
     return layers
 
-""" create a st graph from the original graph in order to use connectivity algorithms. """
+""" create a s-t graph from the original graph in order to use connectivity algorithms. """
 def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
     G = copy.deepcopy(graph)
     G.add_node('t', status = 'target')
@@ -146,7 +141,7 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
         G.add_edge(node,'t')
     return G
 
-"""" flow reduction to the original st graph in order to find min st cut based on the information in the article.  """
+"""" flow reduction to the original s-t graph in order to find min s-t cut based on the information in the article.  """
 def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
     H = nx.DiGraph()
     for node in graph.nodes:
@@ -159,12 +154,13 @@ def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
     for edge in graph.edges:
         H.add_edge(f'{edge[0]}_out', f'{edge[1]}_in', weight=float('inf'))
     display_graph(H)
-    return algo.minimum_st_edge_cut(H,f'{source}_out','t_in')
+    return algo.minimum_st_node_cut(H,f'{source}_out','t_in')
 
 """ calculate the vaccine matrix based on the calculation in the article at the DirLayNet algorithm section.
 the function returns the minimum budget according to the matrix calculation. """
 def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
-    nodes_list = []
+    nodes_list = [] # = N_i 
+    print(layers, min_cut_nodes)
     for i in range(1,len(layers)):
         common_elements = set(min_cut_nodes) & set(layers[i])
         nodes_list.append(common_elements)
@@ -172,19 +168,54 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
     matrix = np.zeros((len(layers)-1, len(layers)-1))
     for i in range (len(layers)-1):
         for j in range(i, len(layers)-1):
-            matrix[i][j] = len(nodes_list[j])/(j+1)
+            matrix[i][j] = math.floor((len(nodes_list[j])/(j+1))) # here we can chose ceil or floor.
+    
+    row_sum = []
+    for i in range(len(matrix[i])):
+        row_sum.append(0)
+        for j in range(len(matrix[j])):
+            print(matrix[i][j])
+            row_sum[i] += matrix[i][j]
+
+    print(row_sum)
     print(matrix)
+    return
+
+
+"Temporary method to display the graph using matlab (will be changed later to viewed from a website)"
+def display_graph(graph:nx.DiGraph)->None:
+    pos = nx.shell_layout(graph)
+    colors = [node_colors.get(data.get('status', 'default'), 'default') for node, data in graph.nodes(data=True)]
+    nx.draw(graph, pos, node_color=colors, with_labels=True, font_weight='bold')
+    
+    if nx.get_edge_attributes(graph, 'weight'):
+        edge_labels = nx.get_edge_attributes(graph, 'weight')
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
+    plt.show()
     return
 
 if __name__ == "__main__":
     G2 = nx.DiGraph()
-    G2.add_node(0, status = 'target', weight = 1)
-    G2.add_node(1, status = 'target', weight = 2)
-    G2.add_node(2, status = 'target', weight = 2)
-    G2.add_node(3, status = 'target', weight = 3)
-    G2.add_node(4, status = 'target', weight = 3)
-    G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(2,3),(2,4)])
-    adjust_nodes_capacity(G2, 0)
-    calculate_vaccine_matrix([[0], [1, 2], [3, 4]], [1,4])
+    G2.add_node(0, status = 'target')
+    G2.add_node(1, status = 'target')
+    G2.add_node(2, status = 'target')
+    G2.add_node(3, status = 'target')
+    G2.add_node(4, status = 'target')
+    G2.add_node(5, status = 'target')
+    G2.add_node(6, status = 'target')
+    G2.add_node(7, status = 'target')
+    G2.add_node(8, status = 'target')
+    #G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(2,3),(2,4)])
+    #adjust_nodes_capacity(G2, 0)
+    #calculate_vaccine_matrix([[0], [1, 2], [3, 4]], [1,2])
+    #G2 = nx.Digraph  G2.add_nodes_from([0,1,2,3,4,5,6,7,8])
+    G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
+    #calculate_vaccine_matrix(list(nx.bfs_layers(G2,0)), algo.minimum_st_node_cut(G2,0,8))
+    layers = adjust_nodes_capacity(G2, 0)
+    print(G2.nodes.data(), layers)
+    G = create_st_graph(G2, [1,3,4,5])
+    min_cut_nodes = graph_flow_reduction(G,0)
+    min_cut_nodes = {int(item[0].split('_')[0]) for item in min_cut_nodes}
+    calculate_vaccine_matrix(layers,min_cut_nodes)
     
         
