@@ -37,7 +37,9 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
                             if key in targets:
                                 direct_vaccination[option].append(key)
         gamma[key] = vaccination_options
-
+    
+    print("Gamma is: " + str(gamma))
+    print("S(u,t) is: " + str(direct_vaccination))
     return gamma, direct_vaccination
 
 """ Calculate Epsilon based on the calculation in the article. """
@@ -59,7 +61,8 @@ def calculate_epsilon(direct_vaccinations:dict)->list:
     # Append the last group
     if current_group:
         epsilon.append(current_group)
-
+    
+    print("Epsilon is: " + str(epsilon))
     return epsilon
 
 """ find the best direct vaccination in the current time step that saves more new node in targets.
@@ -78,8 +81,11 @@ def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, cur
                 nodes_saved = common_elements
                 max_number = len(common_elements)
 
-    if common_elements is not None:
+    if nodes_saved is not None:
         targets[:] = [element for element in targets if element not in nodes_saved]
+    
+    if best_vaccination != ():
+        print("The best direct vaccination is: " + str(best_vaccination) + " and it's saves nodes: " + str(nodes_saved))
     return best_vaccination
 
 """ spread the virus on the graph from the infected nodes. """
@@ -93,7 +99,7 @@ def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
     infected_nodes.clear()
     for node in new_infected_nodes:
         infected_nodes.append(node)  
-
+    display_graph(graph)
     return bool(infected_nodes)
 
 """ spread the vaccination on the graph from the vaccinated nodes. """
@@ -106,12 +112,14 @@ def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
                 new_vaccinated_nodes.append(neighbor)
     vaccinated_nodes.clear()
     for node in new_vaccinated_nodes:
-        vaccinated_nodes.append(node)            
+        vaccinated_nodes.append(node) 
+    display_graph(graph)              
     return
 
 """ directly vaccinate a specific node on the graph. """
 def vaccinate_node(graph:nx.DiGraph, node:int)->None:
     graph.nodes[node]['status'] = 'directly vaccinated'
+    display_graph(graph)
     return
 
 "Simple method to clean the graph and return it to its base state"
@@ -120,7 +128,7 @@ def clean_graph(graph:nx.DiGraph)->None:
         graph.nodes[node]['status'] = 'target'
     return
 
-"NoN-Spreading:"
+"Non-Spreading:"
 
 """ adjust the nodes capacity based on the formula in the article at the DirLayNet algorithm section. """
 def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
@@ -139,6 +147,7 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
     G.add_node('t', status = 'target')
     for node in targets:
         G.add_edge(node,'t')
+    display_graph(G)
     return G
 
 """" flow reduction to the original s-t graph in order to find min s-t cut based on the information in the article.  """
@@ -170,17 +179,15 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
         for j in range(i, len(layers)-1):
             matrix[i][j] = math.floor((len(nodes_list[j])/(j+1))) # here we can chose ceil or floor.
     
-    row_sum = []
-    for i in range(len(matrix[i])):
-        row_sum.append(0)
-        for j in range(len(matrix[j])):
+    matrix_size = len(matrix[i])
+    row_sum = [0]*matrix_size
+    for i in range(matrix_size):
+        for j in range(matrix_size):
             print(matrix[i][j])
             row_sum[i] += matrix[i][j]
-
     print(row_sum)
     print(matrix)
-    return
-
+    return int(max(row_sum))
 
 "Temporary method to display the graph using matlab (will be changed later to viewed from a website)"
 def display_graph(graph:nx.DiGraph)->None:
@@ -213,9 +220,8 @@ if __name__ == "__main__":
     #calculate_vaccine_matrix(list(nx.bfs_layers(G2,0)), algo.minimum_st_node_cut(G2,0,8))
     layers = adjust_nodes_capacity(G2, 0)
     print(G2.nodes.data(), layers)
-    G = create_st_graph(G2, [1,3,4,5])
+    G = create_st_graph(G2, [6,7,8])
     min_cut_nodes = graph_flow_reduction(G,0)
-    min_cut_nodes = {int(item[0].split('_')[0]) for item in min_cut_nodes}
-    calculate_vaccine_matrix(layers,min_cut_nodes)
-    
+    min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
+    print(calculate_vaccine_matrix(layers,min_cut_nodes))    
         

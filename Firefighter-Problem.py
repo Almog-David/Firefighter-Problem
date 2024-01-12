@@ -41,23 +41,20 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
     can_spread = True
     Graph.nodes[source]['status'] = 'infected'
     infected_nodes.append(source)
-    #display_graph(Graph)
+    display_graph(Graph)
     gamma, direct_vaccinations = calculate_gamma(Graph, source, targets)
     epsilon = calculate_epsilon(direct_vaccinations)
     time_step = 0
     while(can_spread):
         spread_vaccination(Graph, vaccinated_nodes)
-        #display_graph(Graph)
         for i in range(budget):
             vaccination = find_best_direct_vaccination(Graph,direct_vaccinations,epsilon[time_step],targets)
             if vaccination != ():
                 vaccination_strategy.append(vaccination)
                 chosen_node = vaccination[0]
                 vaccinate_node(Graph, chosen_node)
-                #display_graph(Graph)
                 vaccinated_nodes.append(chosen_node)
         can_spread = spread_virus(Graph,infected_nodes)
-        #display_graph(Graph)
         time_step = time_step + 1
     
     clean_graph(Graph)
@@ -128,7 +125,6 @@ def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     2
     """
     G = create_st_graph(Graph,targets)
-    #display_graph(G)
     return len(algo.minimum_st_node_cut(G,source,'t'))
 
 def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
@@ -141,11 +137,14 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
 
     non_spreading_dirlaynet_minbudget: Gets a directed graph, source node, and list of targeted nodes that we need to save
     and returns the minimum budget that saves all the nodes from the targeted nodes list.
+    Example1:
+    >>> non_spreading__dirlaynet_minbudget(G3,0,[1,2,3,4,5])
+    2
     """
     layers = adjust_nodes_capacity(Graph, source)
     G = create_st_graph(Graph, targets)
     min_cut_nodes = graph_flow_reduction(G,source)
-    min_cut_nodes = {int(item[0].split('_')[0]) for item in min_cut_nodes}
+    min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
     return calculate_vaccine_matrix(layers,min_cut_nodes)
 
 if __name__ == "__main__":
@@ -165,3 +164,9 @@ if __name__ == "__main__":
     display_graph(G2)
     non_spreading_dirlaynet_minbudget(G2, 0, [1,2,3,4,5,6,7])
     #print(list(nx.bfs_layers(G2,0)))
+    G2.add_node(5, status = 'target')
+    G2.add_node(6, status = 'target')
+    G2.add_node(7, status = 'target')
+    G2.add_node(8, status = 'target')
+    G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
+    print(spreading_maxsave(G2,2, 0, [1,2,3,4,5,6,7,8]))
