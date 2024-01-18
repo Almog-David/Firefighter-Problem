@@ -13,6 +13,18 @@ node_colors = {
     'default' : "#00FFD0"
 }
 
+def validate_parameters(graph:nx.DiGraph, source:int, targets:list)->None:
+    graph_nodes = list(graph.nodes())
+    if source not in graph_nodes:
+        raise ValueError("Error: The source node isn't on the graph")
+        exit()
+    if source in targets:
+        raise ValueError("Error: The source node can't be a part of the targets list, since the virus is spreading from the source")
+        exit()
+    if not all(node in graph_nodes for node in targets):
+        raise ValueError("Error: Not all nodes in the targets list are on the graph.")
+        exit()
+
 "Spreading:"
 
 """ Calculate Gamma and S(u,t) based on the calculation in the article. 

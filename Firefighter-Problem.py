@@ -35,6 +35,10 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
     >>> spreading_maxsave(G2,2,0,G2.nodes())
     [(5,1),(2,1),(8,2)]
     """
+    if budget < 1:
+        raise ValueError("Error: The budget must be at least 1")
+        exit()
+    validate_parameters(Graph,source,targets)
     infected_nodes = []
     vaccinated_nodes = []
     vaccination_strategy = []
@@ -79,6 +83,7 @@ def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
     >>> spreading_minbudget(G2,0,G2.nodes())
     3
     """
+    validate_parameters(Graph,source,targets)
     original_targets = list(targets)
     direct_vaccinations = calculate_gamma(Graph, source, targets)[1]
     min_value = 1
@@ -124,6 +129,7 @@ def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     >>> non_spreading_minbudget(G1,0,G1.nodes())
     2
     """
+    validate_parameters(Graph,source,targets)
     G = create_st_graph(Graph,targets)
     return len(algo.minimum_st_node_cut(G,source,'t'))
 
@@ -141,6 +147,7 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     >>> non_spreading__dirlaynet_minbudget(G3,0,[1,2,3,4,5])
     2
     """
+    validate_parameters(Graph,source,targets)
     layers = adjust_nodes_capacity(Graph, source)
     G = create_st_graph(Graph, targets)
     min_cut_nodes = graph_flow_reduction(G,source)
@@ -158,15 +165,15 @@ if __name__ == "__main__":
     # G2.add_edges_from([(0,1),(0,2),(0,3),(1,4),(2,5),(3,6),(4,7),(6,8), ])
     
     # G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,5),(4,5)]) 2 layer
-    G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,7),(2,3),(2,4),(2,7),(3,5),(3,6),(3,7),(4,5),(4,6),(4,7),(5,7),(6,7)]) # 3 layer
+    #G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,7),(2,3),(2,4),(2,7),(3,5),(3,6),(3,7),(4,5),(4,6),(4,7),(5,7),(6,7)]) # 3 layer
     # G2.add_edges_from([(0,1),(0,2),(0,3),(1,4),(1,5),(1,6),(2,4),(2,5),(2,6),(3,4),(3,5),(3,6),(4,7),(5,7),(6,7)])
     # G2.add_edges_from([(0,1),(0,2),(0,3),(1,5),(2,6),(3,4),(4,7),(5,7),(6,7)])
-    display_graph(G2)
+    #display_graph(G2)
     non_spreading_dirlaynet_minbudget(G2, 0, [1,2,3,4,5,6,7])
     #print(list(nx.bfs_layers(G2,0)))
     G2.add_node(5, status = 'target')
     G2.add_node(6, status = 'target')
     G2.add_node(7, status = 'target')
     G2.add_node(8, status = 'target')
-    G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
-    print(spreading_maxsave(G2,2, 0, [1,2,3,4,5,6,7,8]))
+    #G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
+    #print(spreading_maxsave(G2,2, 0, [1,2,3,4,5,6,7,8]))
