@@ -212,28 +212,3 @@ def display_graph(graph:nx.DiGraph)->None:
         nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
     plt.show()
     return
-
-if __name__ == "__main__":
-    G2 = nx.DiGraph()
-    G2.add_node(0, status = 'target')
-    G2.add_node(1, status = 'target')
-    G2.add_node(2, status = 'target')
-    G2.add_node(3, status = 'target')
-    G2.add_node(4, status = 'target')
-    G2.add_node(5, status = 'target')
-    G2.add_node(6, status = 'target')
-    G2.add_node(7, status = 'target')
-    G2.add_node(8, status = 'target')
-    #G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(2,3),(2,4)])
-    #adjust_nodes_capacity(G2, 0)
-    #calculate_vaccine_matrix([[0], [1, 2], [3, 4]], [1,2])
-    #G2 = nx.Digraph  G2.add_nodes_from([0,1,2,3,4,5,6,7,8])
-    G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
-    #calculate_vaccine_matrix(list(nx.bfs_layers(G2,0)), algo.minimum_st_node_cut(G2,0,8))
-    layers = adjust_nodes_capacity(G2, 0)
-    print(G2.nodes.data(), layers)
-    G = create_st_graph(G2, [6,7,8])
-    min_cut_nodes = graph_flow_reduction(G,0)
-    min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
-    print(calculate_vaccine_matrix(layers,min_cut_nodes))    
-        
