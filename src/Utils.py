@@ -212,3 +212,27 @@ def display_graph(graph:nx.DiGraph)->None:
         nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels)
     plt.show()
     return
+
+def parse_json_to_networkx(json_data):
+    graphs = {}
+    
+    for graph_type, graph_data in json_data.items():
+        for graph_name, graph_info in graph_data.items():
+            
+            graph_key = f"{graph_type}_{graph_name}"
+            if "vertices" not in graph_info or not isinstance(graph_info["vertices"], list) or not graph_info["vertices"]:
+                raise KeyError(f"Error parsing {graph_type}_{graph_name}: 'vertices' must be a non-empty list.")
+
+            if "edges" not in graph_info or not isinstance(graph_info["edges"], list) or not graph_info["edges"]:
+                raise KeyError(f"Error parsing {graph_type}_{graph_name}: 'edges' must be a non-empty list.")
+
+            vertices = graph_info["vertices"]
+            edges = [(edge["source"], edge["target"]) for edge in graph_info["edges"]]
+            
+            G = nx.DiGraph()
+            G.add_nodes_from(vertices)
+            G.add_edges_from(edges)
+                
+            graphs[graph_key] = G
+
+    return graphs

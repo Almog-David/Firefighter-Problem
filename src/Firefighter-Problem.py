@@ -1,7 +1,9 @@
 import networkx as nx
 import networkx.algorithms.connectivity as algo 
-from Utils import *
 import math
+import json
+
+from Utils import *
 
 """
 Examples of graphs that we will use in the following runing examples:
@@ -155,25 +157,13 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     return calculate_vaccine_matrix(layers,min_cut_nodes)
 
 if __name__ == "__main__":
-    G2 = nx.DiGraph()
-    G2.add_node(0, status = 'target')
-    G2.add_node(1, status = 'target')
-    G2.add_node(2, status = 'target')
-    G2.add_node(3, status = 'target')
-    G2.add_node(4, status = 'target')
-    # G2 = nx.Digraph  G2.add_nodes_from([0,1,2,3,4,5,6,7,8])
-    # G2.add_edges_from([(0,1),(0,2),(0,3),(1,4),(2,5),(3,6),(4,7),(6,8), ])
-    
-    # G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,5),(4,5)]) 2 layer
-    #G2.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,7),(2,3),(2,4),(2,7),(3,5),(3,6),(3,7),(4,5),(4,6),(4,7),(5,7),(6,7)]) # 3 layer
-    # G2.add_edges_from([(0,1),(0,2),(0,3),(1,4),(1,5),(1,6),(2,4),(2,5),(2,6),(3,4),(3,5),(3,6),(4,7),(5,7),(6,7)])
-    # G2.add_edges_from([(0,1),(0,2),(0,3),(1,5),(2,6),(3,4),(4,7),(5,7),(6,7)])
-    #display_graph(G2)
-    non_spreading_dirlaynet_minbudget(G2, 0, [1,2,3,4,5,6,7])
-    #print(list(nx.bfs_layers(G2,0)))
-    G2.add_node(5, status = 'target')
-    G2.add_node(6, status = 'target')
-    G2.add_node(7, status = 'target')
-    G2.add_node(8, status = 'target')
-    #G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
-    #print(spreading_maxsave(G2,2, 0, [1,2,3,4,5,6,7,8]))
+    with open("src/graphs.json", "r") as file:
+        json_data = json.load(file)
+    graphs = parse_json_to_networkx(json_data)
+    G1 = graphs["Dirlay_Graph-1"]
+    G2 = graphs["RegularGraph_Graph-1"]
+
+    for graph_key, graph in graphs.items():
+        print(f"\nGraph {graph_key}:")
+        print("Nodes:", graph.nodes())
+        print("Edges:", graph.edges())
