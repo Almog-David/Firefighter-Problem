@@ -22,15 +22,6 @@ def test_dirlay():
 def test_validate_parameters(test_graph):
     pass
 
-def test_calculate_gamma(test_graph):
-    pass
-
-def test_calculate_epsilon(test_graph):
-    pass
-
-def test_find_best_direct_vaccination(test_graph):
-    pass
-
 def test_spread_virus(test_graph):
     pass
 
