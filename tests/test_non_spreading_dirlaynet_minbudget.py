@@ -8,13 +8,64 @@ from src.Utils import parse_json_to_networkx
 @pytest.fixture
 def sample_json_data(): return
 
-def get_graphs(): return
+def get_graphs(): 
+    with open("src/graphs.json", "r") as file:
+        json_data = json.load(file)
+    graphs = parse_json_to_networkx(json_data = json_data)
+    return graphs
 
-def test_source_not_in_graph(): return #checks if the source node is not a real node in the graph.
+graphs = get_graphs() 
 
-def test_target_not_in_graph(): return #checks if a node we're trying to save is not in the graph.
+def test_source_not_in_graph(): 
+    """
+    This test checks if the source node is not a real node in the graph.
+    """
+    with pytest.raises(ValueError, match = "Error: The source node is not on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-1"], -3 [0,5])
 
-def test_source_is_target(): return #checks if we're trying to save a source node.
+    with pytest.raises(ValueError, match = "Error: The source node is not on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-2"], 13 [0,1,4])
+    
+    with pytest.raises(ValueError, match = "Error: The source node is not on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-3"], 15 [0,6,7])
+
+    with pytest.raises(ValueError, match = "Error: The source node is not on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-4"], -1 [1,3,5,7])
+
+     
+def test_target_not_in_graph():
+    """
+    This test checks if a node we're trying to save is not in the graph.
+    """
+    with pytest.raises(ValueError, match = "Error: Not all nodes we're trying to save are on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-1"], 0 [1,5,7]) #7#
+
+    with pytest.raises(ValueError, match = "Error: Not all nodes we're trying to save are on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-2"], 1 [0,2,-1,9]) #-1,9#
+    
+    with pytest.raises(ValueError, match = "Error: Not all nodes we're trying to save are on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-3"], 4 [0,1,2,11,12,13,14]) #11,12,13,14#
+
+    with pytest.raises(ValueError, match = "Error: Not all nodes we're trying to save are on the graph"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-4"], 0 [1,3,5,7,15,20]) #15,20#
+
+
+def test_source_is_target():
+    """
+    This test checks if we're trying to save a source node.
+    """
+    with pytest.raises(ValueError, match = "Error: The source node can not be a part of the targets vector"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-1"], 0 [0,5])
+
+    with pytest.raises(ValueError, match = "Error: The source node can not be a part of the targets vector"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-2"], 1 [0,1,4])
+    
+    with pytest.raises(ValueError, match = "Error: The source node can not be a part of the targets vector"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-3"], 6 [0,6,7])
+
+    with pytest.raises(ValueError, match = "Error: The source node can not be a part of the targets vector"):
+        non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-4"], 3 [1,3,5,7])
+
 
 def test_nodes_capacity(): return # checks if the node capacity is correct.
 
