@@ -150,7 +150,8 @@ def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
         harmonic_sum = harmonic_sum + 1/i
     for index in range(1,len(layers)):
         for node in layers[index]:
-            graph.nodes[node]['capacity'] = 1/(index*harmonic_sum)       
+            graph.nodes[node]['capacity'] = 1/(index*harmonic_sum)
+    print("Layers: ", layers)       
     return layers
 
 """ create a s-t graph from the original graph in order to use connectivity algorithms. """

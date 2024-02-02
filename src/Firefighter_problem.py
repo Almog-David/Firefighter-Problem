@@ -167,3 +167,6 @@ if __name__ == "__main__":
         print(f"\nGraph {graph_key}:")
         print("Nodes:", graph.nodes())
         print("Edges:", graph.edges())
+    
+    adjust_nodes_capacity( graphs["Dirlay_Graph-4"],0)
+    create_st_graph(graphs["Dirlay_Graph-1"], [1,2,3])
