@@ -151,7 +151,7 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     """
     validate_parameters(Graph,source,targets)
     layers = adjust_nodes_capacity(Graph, source)
-    G = create_st_graph(Graph, targets)
+    G = create_st_graph(Graph, targets) # [N1->nodes, N2->nodes] ... 
     min_cut_nodes = graph_flow_reduction(G,source)
     min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
     return calculate_vaccine_matrix(layers,min_cut_nodes)
@@ -163,10 +163,15 @@ if __name__ == "__main__":
     G1 = graphs["Dirlay_Graph-1"]
     G2 = graphs["RegularGraph_Graph-1"]
 
-    for graph_key, graph in graphs.items():
-        print(f"\nGraph {graph_key}:")
-        print("Nodes:", graph.nodes())
-        print("Edges:", graph.edges())
+    # for graph_key, graph in graphs.items():
+    #     print(f"\nGraph {graph_key}:")
+    #     print("Nodes:", graph.nodes())
+    #     print("Edges:", graph.edges())
     
-    adjust_nodes_capacity( graphs["Dirlay_Graph-4"],0)
-    create_st_graph(graphs["Dirlay_Graph-1"], [1,2,3])
+    graph_1 = graphs["Dirlay_Graph-4"]
+    layers = adjust_nodes_capacity(graph_1,0)
+    targets = [4,5,6,8]
+    G1 = create_st_graph(graph_1, targets)
+    min_cut_nodes = graph_flow_reduction(G1,0)
+    min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
+    calculate_vaccine_matrix(layers,min_cut_nodes)
