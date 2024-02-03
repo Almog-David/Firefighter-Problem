@@ -162,7 +162,8 @@ def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
         harmonic_sum = harmonic_sum + 1/i
     for index in range(1,len(layers)):
         for node in layers[index]:
-            graph.nodes[node]['capacity'] = 1/(index*harmonic_sum)       
+            graph.nodes[node]['capacity'] = 1/(index*harmonic_sum)
+    print("Layers: ", layers)       
     return layers
 
 """ create a s-t graph from the original graph in order to use connectivity algorithms. """
@@ -175,7 +176,7 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
     return G
 
 """" flow reduction to the original s-t graph in order to find min s-t cut based on the information in the article.  """
-def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
+def graph_flow_reduction(graph:nx.DiGraph, source:int)->nx.DiGraph:
     H = nx.DiGraph()
     for node in graph.nodes:
         in_node, out_node = f'{node}_in', f'{node}_out'
@@ -186,12 +187,18 @@ def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
             H.add_edge(in_node, out_node, weight=graph.nodes[node]['capacity'])
     for edge in graph.edges:
         H.add_edge(f'{edge[0]}_out', f'{edge[1]}_in', weight=float('inf'))
-    #display_graph(H)
-    return algo.minimum_st_node_cut(H,f'{source}_out','t_in')
+    display_graph(H)
+    return H
+
+""" This method takes the graph after reduction and returns the min_cut by the seperated layered nodes groups """
+def min_cut_N_groups(graph:nx.DiGraph, source:int) -> list: 
+    flow_graph = algo.minimum_st_node_cut(graph,f'{source}_out','t_in') #run algo on the graph after reduction and get the min-cut
+    n_groups = {int(item.split('_')[0]) for item in flow_graph} # split it to the groups accordingly.
+    return n_groups
 
 """ calculate the vaccine matrix based on the calculation in the article at the DirLayNet algorithm section.
 the function returns the minimum budget according to the matrix calculation. """
-def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
+def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->np.matrix: # TODO : sepreate this into two methods - matrix calcualtion and then return the minbudget
     nodes_list = [] # = N_i 
     print(layers, min_cut_nodes)
     for i in range(1,len(layers)):
@@ -201,8 +208,18 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
     matrix = np.zeros((len(layers)-1, len(layers)-1))
     for i in range (len(layers)-1):
         for j in range(i, len(layers)-1):
-            matrix[i][j] = math.floor((len(nodes_list[j])/(j+1))) # here we can chose ceil or floor.
+            matrix[i][j] = ((len(nodes_list[j])/(j+1))) # here we can chose ceil or floor.
+    print(matrix)
+    return matrix
     
+
+"Gets a matrix and validates or alters its values to integers - TBD how to do it"
+def matrix_to_integers_values(matrix:np.matrix) -> np.matrix: return
+
+"Gets a matrix after its been altered to be with integers and returns the min budget"
+def min_budget_calculation(matrix:np.matrix) -> int :
+    # integral_matrix = matrix_to_integers_values(matrix) TODO : make this work.
+    i = j = 0
     matrix_size = len(matrix[i])
     row_sum = [0]*matrix_size
     for i in range(matrix_size):
@@ -210,7 +227,6 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->int:
             print(matrix[i][j])
             row_sum[i] += matrix[i][j]
     print(row_sum)
-    print(matrix)
     return int(max(row_sum))
 
 "Temporary method to display the graph using matlab (will be changed later to viewed from a website)"
