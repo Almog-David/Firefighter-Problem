@@ -32,6 +32,7 @@ In our implementation, Gamma = gamma and S(u,t) = direct_vaccination. """
 def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
     gamma = {}
     direct_vaccination = {}
+    unreachable_nodes = []
     path_length = dict(nx.all_pairs_shortest_path_length(graph))
     for key in graph.nodes:
         vaccination_options = []
@@ -48,7 +49,17 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
                                 direct_vaccination[option] = []
                             if key in targets:
                                 direct_vaccination[option].append(key)
-        gamma[key] = vaccination_options
+
+        # if the virus can't reach to the node - it's automatically saved 
+        if not vaccination_options:
+            unreachable_nodes.append(key)
+        if key != source:                       
+            gamma[key] = vaccination_options
+
+    # add all the unreachable nodes to the vaccination strategy - every strategy can save them 
+    for strategy in direct_vaccination:
+        for node in unreachable_nodes:
+            direct_vaccination[strategy].append(node)
     
     print("Gamma is: " + str(gamma))
     print("S(u,t) is: " + str(direct_vaccination))
@@ -230,7 +241,8 @@ def parse_json_to_networkx(json_data):
             edges = [(edge["source"], edge["target"]) for edge in graph_info["edges"]]
             
             G = nx.DiGraph()
-            G.add_nodes_from(vertices)
+            for node in vertices:
+                 G.add_node(node, status = 'target')
             G.add_edges_from(edges)
                 
             graphs[graph_key] = G

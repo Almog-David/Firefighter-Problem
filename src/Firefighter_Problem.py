@@ -160,12 +160,6 @@ if __name__ == "__main__":
     with open("src/graphs.json", "r") as file:
         json_data = json.load(file)
     graphs = parse_json_to_networkx(json_data)
-    G1 = graphs["Dirlay_Graph-1"]
-    G2 = graphs["RegularGraph_Graph-1"]
 
-    for graph_key, graph in graphs.items():
-        print(f"\nGraph {graph_key}:")
-        print("Nodes:", graph.nodes())
-        print("Edges:", graph.edges())
     
     

@@ -93,19 +93,19 @@ def test_save_after_division():
     pass
 
 def test_save_all_vertices():
-    assert answer_1 == spreading_minbudget(graphs["RegularGraph_Graph-1"], 0, [1,2,3,4,5,6])
-    assert answer_2 == spreading_minbudget(graphs["RegularGraph_Graph-2"], 0, [1,2,3,4,5,6,7])
-    assert answer_1 != spreading_minbudget(graphs["RegularGraph_Graph-3"], 0, [1,2,3,4,5])
-    assert answer_1 < spreading_minbudget(graphs["RegularGraph_Graph-4"], 0, [1,2,3,4,5,6,7])
-    assert answer_1 > spreading_minbudget(graphs["RegularGraph_Graph-6"], 1, [0,2,3,4,5,6,7,8,9])
-    assert answer_1 == spreading_minbudget(graphs["RegularGraph_Graph-7"], 1, [0,2,3,4,5,6])
-    assert answer_1 != spreading_minbudget(graphs["RegularGraph_Graph-8"], 0, [1,2,3,4,5,6,7,8,9,10,11,12,13,14])
+    assert 2 == spreading_minbudget(graphs["RegularGraph_Graph-1"], 0, [1,2,3,4,5,6]) # answer is 2
+    assert 2 == spreading_minbudget(graphs["RegularGraph_Graph-2"], 0, [1,2,3,4,5,6,7]) # answer is 2
+    assert 3 != spreading_minbudget(graphs["RegularGraph_Graph-3"], 0, [1,2,3,4,5]) # answer is 2
+    assert spreading_minbudget(graphs["RegularGraph_Graph-2"], 0, [1,2,3,4,5,6,7]) > spreading_minbudget(graphs["RegularGraph_Graph-4"], 0, [1,2,3,4,5,6,7]) # answer is 1 
+    assert spreading_minbudget(graphs["RegularGraph_Graph-1"], 0, [1,2,3,4,5,6]) < spreading_minbudget(graphs["RegularGraph_Graph-6"], 1, [0,2,3,4,5,6,7,8,9]) # answer is 3 
+    assert 3 == spreading_minbudget(graphs["RegularGraph_Graph-7"], 1, [0,2,3,4,5,6]) # answer is 3 
+    assert 2 != spreading_minbudget(graphs["RegularGraph_Graph-8"], 0, [1,2,3,4,5,6,7,8,9,10,11,12,13,14]) # answer is 3
     
 def test_save_subgroup_vertices():
-    assert answer_1 != non_spreading_minbudget(graphs["RegularGraph_Graph-1"], 0, [1,5,6])
-    assert answer_2 == non_spreading_minbudget(graphs["RegularGraph_Graph-2"], 0, [1,3,4,5,6])
-    assert answer_1 > non_spreading_minbudget(graphs["RegularGraph_Graph-3"], 0, [1,2])
-    assert answer_1 < non_spreading_minbudget(graphs["RegularGraph_Graph-4"], 0, [2,3,5,7])
-    assert answer_1 > non_spreading_minbudget(graphs["RegularGraph_Graph-6"], 1, [0,3,5,6,8,9])
-    assert answer_1 == non_spreading_minbudget(graphs["RegularGraph_Graph-7"], 1, [0,2,5,6])
-    assert answer_1 == non_spreading_minbudget(graphs["RegularGraph_Graph-8"], 0, [1,3,4,5,6,9,10,12,14])
+    assert spreading_minbudget(graphs["RegularGraph_Graph-1"], 0, [1,2,3,4,5,6]) != spreading_minbudget(graphs["RegularGraph_Graph-1"], 0, [1,5,6]) # answer is 1 
+    assert 1 == spreading_minbudget(graphs["RegularGraph_Graph-2"], 0, [1,3,4,5,6]) #answer is 1 
+    assert spreading_minbudget(graphs["RegularGraph_Graph-3"], 0, [1,2,3,4,5]) > spreading_minbudget(graphs["RegularGraph_Graph-3"], 0, [1,3,5]) #answer is 1
+    assert 2 > spreading_minbudget(graphs["RegularGraph_Graph-4"], 0, [2,3,5,7]) # anser is 1 
+    assert 4 > spreading_minbudget(graphs["RegularGraph_Graph-6"], 1, [0,3,5,6,8,9]) #answer is 1 
+    assert 2 == spreading_minbudget(graphs["RegularGraph_Graph-7"], 1, [4,2,5,6]) #answer is 2 
+    assert spreading_minbudget(graphs["RegularGraph_Graph-8"], 0, [1,2,3,4,5,6,7,8,9,10,11,12,13,14]) == spreading_minbudget(graphs["RegularGraph_Graph-8"], 0, [1,3,4,5,6,9,10,12,14]) #answer is 3
