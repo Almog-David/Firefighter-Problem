@@ -99,3 +99,17 @@ def test_parse_exceptions_missing_edges(missing_edges_json):
 def test_parse_exceptions_empty_json(empty_json):
     with pytest.raises(KeyError):
         parse_json_to_networkx(empty_json)
+        
+def test_parsing_dirlay_graph_status(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    dirlay_graph = graphs["Dirlay_Graph-1"]
+    for node in dirlay_graph.nodes(data=True):
+        assert node[1]["status"] == "target"
+
+def test_parsing_regular_graph_status(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    regular_graph = graphs["RegularGraph_Graph-1"]
+    for node in regular_graph.nodes(data=True):
+        assert node[1]["status"] == "target"
