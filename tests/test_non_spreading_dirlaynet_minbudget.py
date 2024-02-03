@@ -12,9 +12,6 @@ from src.Utils import min_cut_N_groups
 from src.Utils import matrix_to_integers_values
 from src.Utils import min_budget_calculation
 
-@pytest.fixture
-def sample_json_data(): return
-
 def get_graphs(): 
     with open("src/graphs.json", "r") as file:
         json_data = json.load(file)
@@ -39,7 +36,6 @@ def test_source_not_in_graph():
     with pytest.raises(ValueError, match = "Error: The source node is not on the graph"):
         non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-4"], -1 [1,3,5,7])
 
-     
 def test_target_not_in_graph():
     """
     This test checks if a node we're trying to save is not in the graph.
@@ -55,7 +51,6 @@ def test_target_not_in_graph():
 
     with pytest.raises(ValueError, match = "Error: Not all nodes we're trying to save are on the graph"):
         non_spreading_dirlaynet_minbudget(graphs["Dirlay_Graph-4"], 0 [1,3,5,7,15,20]) #15,20#
-
 
 def test_source_is_target():
     """
@@ -258,7 +253,6 @@ def test_calculate_vaccine_matrix():
                 [  0,   0,   1/3]]
     assert set(calculate_vaccine_matrix(layers_3,N_3_groups)) == matrix_3
 
-
     #Test 4
     #checking equality
     matrix_4 = [[5/6, 5/6, 1/3, 0, 0]
@@ -269,7 +263,6 @@ def test_calculate_vaccine_matrix():
                 [  0,  0,  0,   0, 0]]
     assert set(calculate_vaccine_matrix(layers_4,N_4_groups)) == matrix_4
     
-
 def test_matrix_to_integers_values(): 
     pass #in case the matrix is not ingeral from previous step, we need to make it one (so vaccianation is correct- cant vaccinate fractional node)
 
