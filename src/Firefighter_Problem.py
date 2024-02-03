@@ -3,7 +3,7 @@ import networkx.algorithms.connectivity as algo
 import math
 import json
 
-from Utils import *
+from src.Utils import *
 
 """
 Examples of graphs that we will use in the following runing examples:
@@ -47,7 +47,7 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
     can_spread = True
     Graph.nodes[source]['status'] = 'infected'
     infected_nodes.append(source)
-    display_graph(Graph)
+    #display_graph(Graph)
     gamma, direct_vaccinations = calculate_gamma(Graph, source, targets)
     epsilon = calculate_epsilon(direct_vaccinations)
     time_step = 0

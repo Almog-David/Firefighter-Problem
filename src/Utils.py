@@ -111,7 +111,7 @@ def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
     infected_nodes.clear()
     for node in new_infected_nodes:
         infected_nodes.append(node)  
-    display_graph(graph)
+    #display_graph(graph)
     return bool(infected_nodes)
 
 """ spread the vaccination on the graph from the vaccinated nodes. """
@@ -125,13 +125,13 @@ def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
     vaccinated_nodes.clear()
     for node in new_vaccinated_nodes:
         vaccinated_nodes.append(node) 
-    display_graph(graph)              
+    #display_graph(graph)              
     return
 
 """ directly vaccinate a specific node on the graph. """
 def vaccinate_node(graph:nx.DiGraph, node:int)->None:
     graph.nodes[node]['status'] = 'directly vaccinated'
-    display_graph(graph)
+    #display_graph(graph)
     return
 
 "Simple method to clean the graph and return it to its base state"
@@ -159,7 +159,7 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
     G.add_node('t', status = 'target')
     for node in targets:
         G.add_edge(node,'t')
-    display_graph(G)
+    #display_graph(G)
     return G
 
 """" flow reduction to the original s-t graph in order to find min s-t cut based on the information in the article.  """
@@ -174,7 +174,7 @@ def graph_flow_reduction(graph:nx.DiGraph, source:int)->list:
             H.add_edge(in_node, out_node, weight=graph.nodes[node]['capacity'])
     for edge in graph.edges:
         H.add_edge(f'{edge[0]}_out', f'{edge[1]}_in', weight=float('inf'))
-    display_graph(H)
+    #display_graph(H)
     return algo.minimum_st_node_cut(H,f'{source}_out','t_in')
 
 """ calculate the vaccine matrix based on the calculation in the article at the DirLayNet algorithm section.
@@ -230,7 +230,7 @@ def parse_json_to_networkx(json_data):
             edges = [(edge["source"], edge["target"]) for edge in graph_info["edges"]]
             
             G = nx.DiGraph()
-            G.add_nodes_from(vertices)
+            G.add_nodes_from(vertices, status="target")
             G.add_edges_from(edges)
                 
             graphs[graph_key] = G
