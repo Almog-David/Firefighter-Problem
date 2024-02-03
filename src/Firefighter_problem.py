@@ -151,10 +151,12 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     """
     validate_parameters(Graph,source,targets)
     layers = adjust_nodes_capacity(Graph, source)
-    G = create_st_graph(Graph, targets)
-    min_cut_nodes = graph_flow_reduction(G,source)
-    min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
-    return calculate_vaccine_matrix(layers,min_cut_nodes)
+    G = create_st_graph(Graph, targets) # [N1->nodes, N2->nodes] ... 
+    G_reduction = graph_flow_reduction(G,source)
+    N_groups = min_cut_N_groups(G_reduction,source)
+    vacc_matrix = calculate_vaccine_matrix(layers,N_groups)
+    min_budget = min_budget_calculation(vacc_matrix)
+    return min_budget
 
 if __name__ == "__main__":
     with open("src/graphs.json", "r") as file:
@@ -167,3 +169,4 @@ if __name__ == "__main__":
         print(f"\nGraph {graph_key}:")
         print("Nodes:", graph.nodes())
         print("Edges:", graph.edges())
+    
