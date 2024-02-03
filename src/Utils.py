@@ -59,7 +59,8 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
     # add all the unreachable nodes to the vaccination strategy - every strategy can save them 
     for strategy in direct_vaccination:
         for node in unreachable_nodes:
-            direct_vaccination[strategy].append(node)
+            if node in targets:
+                direct_vaccination[strategy].append(node)
     
     print("Gamma is: " + str(gamma))
     print("S(u,t) is: " + str(direct_vaccination))

@@ -3,7 +3,7 @@ import networkx as nx
 import json
 
 from src.Firefighter_Problem import spreading_maxsave
-from src.Utils import parse_json_to_networkx, calculate_gamma, calculate_epsilon
+from src.Utils import parse_json_to_networkx, calculate_gamma, calculate_epsilon, find_best_direct_vaccination
 
 with open("src/graphs.json", "r") as file:
         json_data = json.load(file)
@@ -97,20 +97,17 @@ def test_calculate_gamma(graph_key, source, targets, expected_gamma, expected_di
 
 @pytest.mark.parametrize("direct_vaccinations, expected_epsilon", [
     ({
-        (1, 1): [1],
-        (1, 2): [1],
-        (2, 1): [1, 2, 3],
-        (3, 1): [3],
-        (3, 2): [3],
-        (4, 1): [1, 4, 6, 8],
-        (5, 1): [3, 5, 6, 7, 8],
-        (6, 1): [4, 6, 8],
-        (6, 2): [6, 8],
-        (7, 1): [7, 8],
-        (7, 2): [7, 8],
-        (8, 1): [8],
-        (8, 2): [8],
-        (8, 3): [8],
+        (1, 1): [1, 3, 4, 5],
+        (2, 1): [2, 3, 5, 6],
+        (3, 1): [3, 5],
+        (3, 2): [3, 5],
+        (4, 1): [4],
+        (4, 2): [4],
+        (5, 1): [5],
+        (5, 2): [5],
+        (5, 3): [5],
+        (6, 1): [6],
+        (6, 2): [6],
     }, [
         {(1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)},
         {(3, 2), (4, 2), (5, 2), (6, 2)},
@@ -142,8 +139,51 @@ def test_calculate_epsilon(direct_vaccinations, expected_epsilon):
     
     assert calculated_epsilon == expected_epsilon
 
-def test_find_best_direct_vaccination():
-    pass
+@pytest.mark.parametrize("graph_key, direct_vaccinations, current_epsilon, targets, expected_best_direct_vaccination", [
+    ("RegularGraph_Graph-1",
+     {
+     (1, 1): [1, 2, 3, 4, 5, 7],
+        (2, 1): [2, 3, 4, 7],
+        (2, 2): [2, 3, 7],
+        (3, 1): [3, 4, 7],
+        (3, 2): [3, 4, 7],
+        (3, 3): [3, 7],
+        (4, 1): [4, 7],
+        (4, 2): [4, 7],
+        (4, 3): [4, 7],
+        (5, 1): [2, 3, 4, 5, 7],
+        (5, 2): [3, 4, 5, 7],
+        (6, 1): [3, 4, 5, 6, 7],
+    }, 
+    [(1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)],
+    [1, 3, 4, 5, 6], 
+    (1, 1)),
+    ("Dirlay_Graph-5", 
+     {
+        (1, 1): [1],
+        (1, 2): [1],
+        (2, 1): [1, 2, 3],
+        (3, 1): [3],
+        (3, 2): [3],
+        (4, 1): [1, 4, 6, 8],
+        (5, 1): [3, 5, 6, 7, 8],
+        (6, 1): [4, 6, 8],
+        (6, 2): [6, 8],
+        (7, 1): [7, 8],
+        (7, 2): [7, 8],
+        (8, 1): [8],
+        (8, 2): [8],
+        (8, 3): [8],
+    }, 
+    [(1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1)],
+    [1, 2, 3, 4, 5, 6, 7, 8],
+    (5, 1))
+])
+  
+def test_find_best_direct_vaccination(graph_key, direct_vaccinations, current_epsilon, targets, expected_best_direct_vaccination):
+    calculated_best_direct_vaccination = find_best_direct_vaccination(graphs[graph_key],direct_vaccinations,current_epsilon,targets)
+    
+    assert calculated_best_direct_vaccination == expected_best_direct_vaccination
 
 @pytest.mark.parametrize("graph_key, budget, source, targets, expected_length", [
     ("RegularGraph_Graph-1", 1, 0, [1, 2, 3, 4, 5, 6], 2),
@@ -166,5 +206,12 @@ def test_save_all_vertices(graph_key, budget, source, targets, expected_strategy
     
     assert calculated_strategy == expected_strategy
 
-def test_save_subgroup_vertices():
-    pass
+@pytest.mark.parametrize("graph_key, budget, source, targets, expected_strategy", [
+    ("RegularGraph_Graph-6", 2, 1, [3, 9, 0, 5, 6], {(2, 1), (0, 1)}),
+    ("RegularGraph_Graph-4", 1, 0, [2, 6, 4], {(1, 1), (3, 2)}),
+])
+def test_save_subgroup_vertices(graph_key, budget, source, targets, expected_strategy):
+    graph = graphs[graph_key]
+    calculated_strategy = spreading_maxsave(graph, budget, source, targets)
+    
+    assert calculated_strategy == expected_strategy

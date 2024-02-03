@@ -17,7 +17,6 @@ G3 = nx.Digraph  G3.add_nodes_from([0,1,2,3,4,5])
 G3.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,5),(4,5)])
 """
 
-
 def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) -> list:
     """
     "Approximability of the Firefighter Problem - Computing Cuts over Time",
@@ -166,4 +165,4 @@ if __name__ == "__main__":
     for graph_key, graph in graphs.items():
         print(f"\nGraph {graph_key}:")
         print("Nodes:", graph.nodes())
-        print("Edges:", graph.edges())
+        print("Edges:", graph.edges())       

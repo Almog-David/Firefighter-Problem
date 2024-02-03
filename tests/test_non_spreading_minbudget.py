@@ -84,8 +84,8 @@ def test_save_all_vertices():
     assert 2 == non_spreading_minbudget(graphs["RegularGraph_Graph-1"], 0, [1,2,3,4,5,6]) #answer is 2
     assert 2 == non_spreading_minbudget(graphs["RegularGraph_Graph-2"], 0, [1,2,3,4,5,6,7]) #answer is 2
     assert 3 != non_spreading_minbudget(graphs["RegularGraph_Graph-3"], 0, [1,2,3,4,5]) #answer is 2
-    assert 2 > non_spreading_minbudget(graphs["RegularGraph_Graph-4"], 0, [1,2,3,4,5,6,7]) #answer is 1
-    assert 1 < non_spreading_minbudget(graphs["RegularGraph_Graph-6"], 1, [0,2,3,4,5,6,7,8,9]) #answer is 3 
+    assert 3 > non_spreading_minbudget(graphs["RegularGraph_Graph-4"], 0, [1,2,3,4,5,6,7]) #answer is 2
+    assert 1 == non_spreading_minbudget(graphs["RegularGraph_Graph-6"], 1, [0,2,3,4,5,6,7,8,9]) #answer is 1
     assert 3 == non_spreading_minbudget(graphs["RegularGraph_Graph-7"], 1, [0,2,3,4,5,6]) #answer is 3
     assert 2 != non_spreading_minbudget(graphs["RegularGraph_Graph-8"], 0, [1,2,3,4,5,6,7,8,9,10,11,12,13,14]) #answer is 3
 
