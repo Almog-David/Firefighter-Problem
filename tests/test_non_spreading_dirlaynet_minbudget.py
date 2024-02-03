@@ -277,3 +277,13 @@ def test_min_budget_calculation():
     """
     This test validates that the minbudget is accurate
     """
+
+
+#legacy:
+    # graph_1 = graphs["Dirlay_Graph-4"]
+    # layers = adjust_nodes_capacity(graph_1,0)
+    # targets = [4,5,6,8]
+    # G1 = create_st_graph(graph_1, targets)
+    # min_cut_nodes = graph_flow_reduction(G1,0)
+    # min_cut_nodes = {int(item.split('_')[0]) for item in min_cut_nodes}
+    # calculate_vaccine_matrix(layers,min_cut_nodes)
