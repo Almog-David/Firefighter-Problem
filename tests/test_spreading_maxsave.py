@@ -215,3 +215,5 @@ def test_save_subgroup_vertices(graph_key, budget, source, targets, expected_str
     calculated_strategy = spreading_maxsave(graph, budget, source, targets)
     
     assert calculated_strategy == expected_strategy
+
+    # TODO : add tests on big graphs (100 nodes) - sanity checks only.
