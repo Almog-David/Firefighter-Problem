@@ -19,7 +19,7 @@ def sample_json_data():
             },
         }
     }
-    
+
 @pytest.fixture
 def missing_vertices_json():
     return {
@@ -39,7 +39,7 @@ def missing_edges_json():
             }
         }
     }
-    
+
 @pytest.fixture
 def empty_json():
     return {
@@ -50,26 +50,66 @@ def empty_json():
             }
         }
     }
-    
-def test_parsing(sample_json_data):
+
+
+def test_parsing_dirlay_graph(sample_json_data):
     graphs = parse_json_to_networkx(sample_json_data)
 
-    assert isinstance(graphs["Dirlay_Graph-1"], nx.DiGraph)
-    assert set(graphs["Dirlay_Graph-1"].nodes()) == {0, 1, 2, 3, 4, 5}
-    assert set(graphs["Dirlay_Graph-1"].edges()) == {(0, 1), (0, 2)}
+    dirlay_graph = graphs["Dirlay_Graph-1"]
+    assert isinstance(dirlay_graph, nx.DiGraph)
 
-    assert isinstance(graphs["RegularGraph_Graph-1"], nx.Graph)
-    assert set(graphs["RegularGraph_Graph-1"].nodes()) == {0, 1, 2}
-    assert set(graphs["RegularGraph_Graph-1"].edges()) == {(0, 1), (1, 2)}
+def test_parsing_dirlay_graph_nodes(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    dirlay_graph = graphs["Dirlay_Graph-1"]
+    assert set(dirlay_graph.nodes()) == {0, 1, 2, 3, 4, 5}
+
+def test_parsing_dirlay_graph_edges(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    dirlay_graph = graphs["Dirlay_Graph-1"]
+    assert set(dirlay_graph.edges()) == {(0, 1), (0, 2)}
+
+def test_parsing_regular_graph(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    regular_graph = graphs["RegularGraph_Graph-1"]
+    assert isinstance(regular_graph, nx.Graph)
+
+def test_parsing_regular_graph_nodes(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    regular_graph = graphs["RegularGraph_Graph-1"]
+    assert set(regular_graph.nodes()) == {0, 1, 2}
+
+def test_parsing_regular_graph_edges(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    regular_graph = graphs["RegularGraph_Graph-1"]
+    assert set(regular_graph.edges()) == {(0, 1), (1, 2)}
     
-        
-def test_parse_exceptions(missing_vertices_json, missing_edges_json, empty_json):
-    
+def test_parse_exceptions_missing_vertices(missing_vertices_json):
     with pytest.raises(KeyError):
         parse_json_to_networkx(missing_vertices_json)
 
+def test_parse_exceptions_missing_edges(missing_edges_json):
     with pytest.raises(KeyError):
         parse_json_to_networkx(missing_edges_json)
 
+def test_parse_exceptions_empty_json(empty_json):
     with pytest.raises(KeyError):
         parse_json_to_networkx(empty_json)
+        
+def test_parsing_dirlay_graph_status(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    dirlay_graph = graphs["Dirlay_Graph-1"]
+    for node in dirlay_graph.nodes(data=True):
+        assert node[1]["status"] == "target"
+
+def test_parsing_regular_graph_status(sample_json_data):
+    graphs = parse_json_to_networkx(sample_json_data)
+
+    regular_graph = graphs["RegularGraph_Graph-1"]
+    for node in regular_graph.nodes(data=True):
+        assert node[1]["status"] == "target"

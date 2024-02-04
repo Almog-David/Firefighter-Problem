@@ -32,6 +32,7 @@ In our implementation, Gamma = gamma and S(u,t) = direct_vaccination. """
 def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
     gamma = {}
     direct_vaccination = {}
+    unreachable_nodes = []
     path_length = dict(nx.all_pairs_shortest_path_length(graph))
     for key in graph.nodes:
         vaccination_options = []
@@ -48,7 +49,18 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
                                 direct_vaccination[option] = []
                             if key in targets:
                                 direct_vaccination[option].append(key)
-        gamma[key] = vaccination_options
+
+        # if the virus can't reach to the node - it's automatically saved 
+        if not vaccination_options:
+            unreachable_nodes.append(key)
+        if key != source:                       
+            gamma[key] = vaccination_options
+
+    # add all the unreachable nodes to the vaccination strategy - every strategy can save them 
+    for strategy in direct_vaccination:
+        for node in unreachable_nodes:
+            if node in targets:
+                direct_vaccination[strategy].append(node)
     
     print("Gamma is: " + str(gamma))
     print("S(u,t) is: " + str(direct_vaccination))
@@ -111,7 +123,7 @@ def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
     infected_nodes.clear()
     for node in new_infected_nodes:
         infected_nodes.append(node)  
-    display_graph(graph)
+    #display_graph(graph)
     return bool(infected_nodes)
 
 """ spread the vaccination on the graph from the vaccinated nodes. """
@@ -125,13 +137,13 @@ def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
     vaccinated_nodes.clear()
     for node in new_vaccinated_nodes:
         vaccinated_nodes.append(node) 
-    display_graph(graph)              
+    #display_graph(graph)              
     return
 
 """ directly vaccinate a specific node on the graph. """
 def vaccinate_node(graph:nx.DiGraph, node:int)->None:
     graph.nodes[node]['status'] = 'directly vaccinated'
-    display_graph(graph)
+    #display_graph(graph)
     return
 
 "Simple method to clean the graph and return it to its base state"
@@ -160,7 +172,7 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
     G.add_node('t', status = 'target')
     for node in targets:
         G.add_edge(node,'t')
-    display_graph(G)
+    #display_graph(G)
     return G
 
 """" flow reduction to the original s-t graph in order to find min s-t cut based on the information in the article.  """
@@ -178,9 +190,7 @@ def graph_flow_reduction(graph:nx.DiGraph, source:int)->nx.DiGraph:
     display_graph(H)
     return H
 
-"""
-This method takes the graph after reduction and returns the min_cut by the seperated layered nodes groups
-"""
+""" This method takes the graph after reduction and returns the min_cut by the seperated layered nodes groups """
 def min_cut_N_groups(graph:nx.DiGraph, source:int) -> list: 
     flow_graph = algo.minimum_st_node_cut(graph,f'{source}_out','t_in') #run algo on the graph after reduction and get the min-cut
     n_groups = {int(item.split('_')[0]) for item in flow_graph} # split it to the groups accordingly.
@@ -248,7 +258,7 @@ def parse_json_to_networkx(json_data):
             edges = [(edge["source"], edge["target"]) for edge in graph_info["edges"]]
             
             G = nx.DiGraph()
-            G.add_nodes_from(vertices)
+            G.add_nodes_from(vertices, status="target")
             G.add_edges_from(edges)
                 
             graphs[graph_key] = G
