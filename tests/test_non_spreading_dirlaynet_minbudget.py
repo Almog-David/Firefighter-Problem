@@ -2,7 +2,7 @@ import pytest
 import networkx as nx
 import json
 
-from src.Firefighter_problem import non_spreading_dirlaynet_minbudget
+from src.Firefighter_Problem import non_spreading_dirlaynet_minbudget
 from src.Utils import adjust_nodes_capacity
 from src.Utils import create_st_graph
 from src.Utils import parse_json_to_networkx
@@ -225,6 +225,11 @@ def test_min_cut_N_groups():
     #checking equality
     N3_groups_check = [{1},set(),{7}]
     assert set(min_cut_N_groups(reduction_G3)) == N3_groups_check
+
+    #Test 3
+    #checking equality
+    N4_groups_check = [set(), {4}, {5}, set(), set()]
+    assert set(min_cut_N_groups(reduction_G4)) == N4_groups_check
     
 def test_calculate_vaccine_matrix(): 
     """
@@ -255,11 +260,10 @@ def test_calculate_vaccine_matrix():
 
     #Test 4
     #checking equality
-    matrix_4 = [[5/6, 5/6, 1/3, 0, 0]
+    matrix_4 = [[  0, 0.5, 1/3, 0, 0]
                 [  0, 0.5, 1/3, 0 ,0]
-                [  0, 0.5, 1/3, 0 ,0]
-                [  0,  0,  1/3, 0 ,0]
-                [  0,  0,  0,   0, 0]
+                [  0,  0, 1/3, 0 ,0]
+                [  0,  0,  0, 0 ,0]
                 [  0,  0,  0,   0, 0]]
     assert set(calculate_vaccine_matrix(layers_4,N_4_groups)) == matrix_4
     
@@ -270,7 +274,6 @@ def test_min_budget_calculation():
     """
     This test validates that the minbudget is accurate
     """
-
 
 #legacy:
     # graph_1 = graphs["Dirlay_Graph-4"]

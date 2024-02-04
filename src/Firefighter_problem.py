@@ -5,6 +5,8 @@ import json
 
 from Utils import *
 
+# TODO: make simple examples on how the algorithm works (maybe 2-3 nodes)
+
 """
 Examples of graphs that we will use in the following runing examples:
 G1 = nx.Digraph  G1.add_nodes_from([0,1,2,3,4,5,6])
@@ -16,7 +18,6 @@ G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(
 G3 = nx.Digraph  G3.add_nodes_from([0,1,2,3,4,5])
 G3.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,5),(4,5)])
 """
-
 
 def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) -> list:
     """
@@ -47,7 +48,7 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
     can_spread = True
     Graph.nodes[source]['status'] = 'infected'
     infected_nodes.append(source)
-    display_graph(Graph)
+    #display_graph(Graph)
     gamma, direct_vaccinations = calculate_gamma(Graph, source, targets)
     epsilon = calculate_epsilon(direct_vaccinations)
     time_step = 0
@@ -151,7 +152,7 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     """
     validate_parameters(Graph,source,targets)
     layers = adjust_nodes_capacity(Graph, source)
-    G = create_st_graph(Graph, targets) # [N1->nodes, N2->nodes] ... 
+    G = create_st_graph(Graph, targets)
     G_reduction = graph_flow_reduction(G,source)
     N_groups = min_cut_N_groups(G_reduction,source)
     vacc_matrix = calculate_vaccine_matrix(layers,N_groups)
@@ -168,5 +169,4 @@ if __name__ == "__main__":
     for graph_key, graph in graphs.items():
         print(f"\nGraph {graph_key}:")
         print("Nodes:", graph.nodes())
-        print("Edges:", graph.edges())
-    
+        print("Edges:", graph.edges())       
