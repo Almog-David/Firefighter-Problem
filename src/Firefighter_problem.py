@@ -8,10 +8,6 @@ import json
 from src.Utils import *
 # from Utils import *
 
-# TODO: make simple examples on how the algorithm works (maybe 2-3 nodes)
-
-
-# TODO: add a stopping condition in case the nodes are vaccinated and we have more iterations to go.
 def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, flag=None) -> list:
     """
     "Approximability of the Firefighter Problem - Computing Cuts over Time",

@@ -14,6 +14,19 @@ node_colors = {
 }
 
 def validate_parameters(graph:nx.DiGraph, source:int, targets:list)->None:
+    """
+    Validate the source and target nodes in the graph.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - source (int): Source node.
+    - targets (list): List of target nodes to save.
+
+    Raises:
+    - ValueError: If the source node is not in the graph.
+    - ValueError: If the source node is in the targets list.
+    - ValueError: If any target node is not in the graph.
+    """
     graph_nodes = list(graph.nodes())
     if source not in graph_nodes:
         raise ValueError("Error: The source node isn't on the graph")
@@ -26,10 +39,19 @@ def validate_parameters(graph:nx.DiGraph, source:int, targets:list)->None:
         exit()
 
 "Spreading:"
-
-""" Calculate Gamma and S(u,t) based on the calculation in the article. 
-In our implementation, Gamma = gamma and S(u,t) = direct_vaccination. """
 def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
+    """
+    Calculate Gamma and S(u,t)  based on the calculation in the article.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - source (int): Source node.
+    - targets (list): List of target nodes to save.
+
+    Returns:
+    - gamma (dict): Dictionary of vaccination options.
+    - direct_vaccination (dict): Dictionary of direct vaccination strategies - S(u,t).
+    """
     gamma = {}
     direct_vaccination = {}
     unreachable_nodes = []
@@ -66,8 +88,16 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
     print("S(u,t) is: " + str(direct_vaccination))
     return gamma, direct_vaccination
 
-""" Calculate Epsilon based on the calculation in the article. """
 def calculate_epsilon(direct_vaccinations:dict)->list:
+    """
+    Calculate Epsilon based on the calculation in the article.
+
+    Parameters:
+    - direct_vaccinations (dict): Dictionary of direct vaccination strategies.
+
+    Returns:
+    - epsilon (list): List of direct vaccination groups by time step.
+    """
     epsilon = []
     sorted_dict = dict(sorted(direct_vaccinations.items(), key=lambda item: item[0][1]))
 
@@ -89,9 +119,19 @@ def calculate_epsilon(direct_vaccinations:dict)->list:
     print("Epsilon is: " + str(epsilon))
     return epsilon
 
-""" find the best direct vaccination in the current time step that saves more new node in targets.
-current_time_options is a list of all the direct vaccination options in the current time step. """
 def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, current_time_options:list, targets:list)->tuple:
+    """
+    Find the best direct vaccination strategy for the current time step that saves more new node in targets.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - direct_vaccinations (dict): Dictionary of direct vaccination strategies.
+    - current_time_options (list): List of current time step vaccination options.
+    - targets (list): List of target nodes.
+
+    Returns:
+    - best_vaccination (tuple): Best direct vaccination option.
+    """
     best_vaccination = () 
     nodes_saved = {}
     common_elements = None
@@ -112,8 +152,17 @@ def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, cur
         print("The best direct vaccination is: " + str(best_vaccination) + " and it's saves nodes: " + str(nodes_saved))
     return best_vaccination
 
-""" spread the virus on the graph from the infected nodes. """
 def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
+    """
+    Spread the virus from infected nodes to their neighbors.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - infected_nodes (list): List of currently infected nodes.
+
+    Returns:
+    - bool: True if there are new infections, False otherwise.
+    """
     new_infected_nodes = []
     for node in infected_nodes:
         for neighbor in graph.neighbors(node):
@@ -126,8 +175,14 @@ def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
     #display_graph(graph)
     return bool(infected_nodes)
 
-""" spread the vaccination on the graph from the vaccinated nodes. """
 def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
+    """
+    Spread the vaccination from vaccinated nodes to their neighbors.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - vaccinated_nodes (list): List of currently vaccinated nodes.
+    """
     new_vaccinated_nodes = []
     for node in vaccinated_nodes:
         for neighbor in graph.neighbors(node):
@@ -140,22 +195,43 @@ def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
     #display_graph(graph)              
     return
 
-""" directly vaccinate a specific node on the graph. """
 def vaccinate_node(graph:nx.DiGraph, node:int)->None:
+    """
+    Directly vaccinate a specific node in the graph.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - node (int): Node to be vaccinated.
+    """
     graph.nodes[node]['status'] = 'directly vaccinated'
     #display_graph(graph)
     return
 
-"Simple method to clean the graph and return it to its base state"
 def clean_graph(graph:nx.DiGraph)->None:
+    """
+    Reset the graph to its base state where all nodes are targets.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    """
     for node in graph.nodes:
         graph.nodes[node]['status'] = 'target'
     return
 
 "Non-Spreading:"
 
-""" adjust the nodes capacity based on the formula in the article at the DirLayNet algorithm section. """
 def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
+    """
+    Adjust the capacity of nodes based on the layer they belong to.
+    The capacity is based on the formula in the article at the DirLayNet algorithm section.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - source (int): Source node.
+
+    Returns:
+    - layers (list): List of nodes grouped by layers.
+    """
     layers = (list(nx.bfs_layers(graph,source)))
     harmonic_sum = 0.0
     for i in range(1,len(layers)):
@@ -166,8 +242,17 @@ def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
     print("Layers: ", layers)       
     return layers
 
-""" create a s-t graph from the original graph in order to use connectivity algorithms. """
 def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
+    """
+    Create an s-t graph from the original graph for use in connectivity algorithms.
+
+    Parameters:
+    - graph (nx.DiGraph): Original directed graph.
+    - targets (list): List of target nodes.
+
+    Returns:
+    - G (nx.DiGraph): s-t graph.
+    """
     G = copy.deepcopy(graph)
     G.add_node('t', status = 'target')
     for node in targets:
@@ -175,8 +260,17 @@ def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
     #display_graph(G)
     return G
 
-"""" flow reduction to the original s-t graph in order to find min s-t cut based on the information in the article.  """
 def graph_flow_reduction(graph:nx.DiGraph, source:int)->nx.DiGraph:
+    """
+    Perform flow reduction on the graph to find the minimum s-t cut.
+
+    Parameters:
+    - graph (nx.DiGraph): Original directed graph.
+    - source (int): Source node.
+
+    Returns:
+    - H (nx.DiGraph): Graph after flow reduction.
+    """
     H = nx.DiGraph()
     for node in graph.nodes:
         in_node, out_node = f'{node}_in', f'{node}_out'
@@ -190,15 +284,32 @@ def graph_flow_reduction(graph:nx.DiGraph, source:int)->nx.DiGraph:
     display_graph(H)
     return H
 
-""" This method takes the graph after reduction and returns the min_cut by the seperated layered nodes groups """
 def min_cut_N_groups(graph:nx.DiGraph, source:int) -> list: 
+    """
+    Find the minimum cut and group nodes accordingly.
+
+    Parameters:
+    - graph (nx.DiGraph): Graph after flow reduction.
+    - source (int): Source node.
+
+    Returns:
+    - n_groups (list): List of nodes in the minimum cut.
+    """
     flow_graph = algo.minimum_st_node_cut(graph,f'{source}_out','t_in') #run algo on the graph after reduction and get the min-cut
     n_groups = {int(item.split('_')[0]) for item in flow_graph} # split it to the groups accordingly.
     return n_groups
 
-""" calculate the vaccine matrix based on the calculation in the article at the DirLayNet algorithm section.
-the function returns the minimum budget according to the matrix calculation. """
-def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->np.matrix: # TODO : sepreate this into two methods - matrix calcualtion and then return the minbudget
+def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->np.matrix: 
+    """
+    Calculate the vaccine matrix based on the calculation in the article at the DirLayNet algorithm section.
+
+    Parameters:
+    - layers (list): List of nodes grouped by layers.
+    - min_cut_nodes (list): List of nodes in the minimum cut.
+
+    Returns:
+    - matrix (np.matrix): Vaccine matrix.
+    """
     nodes_list = [] # = N_i 
     print(layers, min_cut_nodes)
     for i in range(1,len(layers)):
@@ -213,11 +324,28 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->np.matrix: # TODO
     return matrix
     
 
-"Gets a matrix and validates or alters its values to integers - TBD how to do it"
-def matrix_to_integers_values(matrix:np.matrix) -> np.matrix: return
+def matrix_to_integers_values(matrix:np.matrix) -> np.matrix: #TODO: THIS 
+    """
+    Convert matrix values to integers.
 
-"Gets a matrix after its been altered to be with integers and returns the min budget"
+    Parameters:
+    - matrix (np.matrix): Input matrix.
+
+    Returns:
+    - np.matrix: Matrix with integer values.
+    """
+    return
+
 def min_budget_calculation(matrix:np.matrix) -> int :
+    """
+    Calculate the minimum budget from the matrix.
+
+    Parameters:
+    - matrix (np.matrix): Input matrix.
+
+    Returns:
+    - int: Minimum budget.
+    """
     # integral_matrix = matrix_to_integers_values(matrix) TODO : make this work.
     i = j = 0
     matrix_size = len(matrix[i])
@@ -229,8 +357,13 @@ def min_budget_calculation(matrix:np.matrix) -> int :
     print(row_sum)
     return int(max(row_sum))
 
-"Temporary method to display the graph using matlab (will be changed later to viewed from a website)"
 def display_graph(graph:nx.DiGraph)->None:
+    """
+    Display the graph using Matplotlib.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    """
     pos = nx.shell_layout(graph)
     colors = [node_colors.get(data.get('status', 'default'), 'default') for node, data in graph.nodes(data=True)]
     nx.draw(graph, pos, node_color=colors, with_labels=True, font_weight='bold')
@@ -242,6 +375,15 @@ def display_graph(graph:nx.DiGraph)->None:
     return
 
 def parse_json_to_networkx(json_data):
+    """
+    Parse JSON data to create Networkx graphs.
+
+    Parameters:
+    - json_data (dict): JSON data containing graph information.
+
+    Returns:
+    - graphs (dict): Dictionary of Networkx graphs.
+    """
     graphs = {}
     
     for graph_type, graph_data in json_data.items():
