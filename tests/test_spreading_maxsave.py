@@ -1,6 +1,7 @@
 import pytest
 import networkx as nx
 import json
+import random
 
 from src.Firefighter_Problem import spreading_maxsave
 from src.Utils import parse_json_to_networkx, calculate_gamma, calculate_epsilon, find_best_direct_vaccination
@@ -218,3 +219,29 @@ def test_save_subgroup_vertices(graph_key, budget, source, targets, expected_str
     assert calculated_strategy == expected_strategy
 
     # TODO : add tests on big graphs (100 nodes) - sanity checks only.
+def random_graph_test():
+    for i in range(10):
+        num_nodes = random.randint(2,100)
+        nodes = list(range(num_nodes+1))
+        num_edges = 1000
+        save_amount = random.randint(1,num_nodes)
+        targets = []
+        G = nx.DiGraph()
+        
+        G.add_nodes_from(nodes, status="target")
+        for _ in range(num_edges):
+            source = random.randint(0, num_nodes - 1)
+            target = random.randint(0, num_nodes - 1)
+            if source != target:  # Ensure no self-loops
+                G.add_edge(source, target)
+        for node in range(save_amount):
+            probability = random.random()
+            if probability < 0.75 and node!=0:
+                targets.append(node)
+        
+        ans = spreading_maxsave(G,0,1,targets)
+        print(ans)
+       
+        assert len(ans) <= len(G.nodes)
+    
+    print("All tests have passed!")

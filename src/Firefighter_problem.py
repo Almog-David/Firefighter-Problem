@@ -2,11 +2,12 @@ import networkx as nx
 import networkx.algorithms.connectivity as algo 
 import math
 import json
+import random
 
 # TODO: fix this shit, when we run tests needs src.Utils, and when we run this, we need Utils only..
 
-from src.Utils import *
-# from Utils import *
+#from src.Utils import *
+from Utils import *
 
 def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, flag=None) -> list:
     """
@@ -60,7 +61,7 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, fl
     gamma, direct_vaccinations = calculate_gamma(Graph, source, targets)
     epsilon = calculate_epsilon(direct_vaccinations)
     time_step = 0
-    while(can_spread):
+    while(can_spread and time_step<len(epsilon)):
         spread_vaccination(Graph, vaccinated_nodes)
         for i in range(budget):
             vaccination = find_best_direct_vaccination(Graph,direct_vaccinations,epsilon[time_step],targets)
@@ -217,16 +218,34 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     min_budget = min_budget_calculation(vacc_matrix)
     return min_budget
 
-if __name__ == "__main__":
-    with open("src/graphs.json", "r") as file:
-        json_data = json.load(file)
-    graphs = parse_json_to_networkx(json_data)
-    G1 = graphs["Dirlay_Graph-1"]
-    G2 = graphs["RegularGraph_Graph-2"]
-    # display_graph(G2)
-    spreading_minbudget(G2,0,[1,3,4,5,6])
+def random_graph_test():
+    for i in range(10):
+        num_nodes = random.randint(2,100)
+        nodes = list(range(num_nodes+1))
+        num_edges = 1000
+        save_amount = random.randint(1,num_nodes)
+        targets = []
+        G = nx.DiGraph()
+        
+        G.add_nodes_from(nodes, status="target")
+        for _ in range(num_edges):
+            source = random.randint(0, num_nodes - 1)
+            target = random.randint(0, num_nodes - 1)
+            if source != target:  # Ensure no self-loops
+                G.add_edge(source, target)
+        for node in range(save_amount):
+            probability = random.random()
+            if probability < 0.75 and node!=0:
+                targets.append(node)
+        
+        ans = spreading_maxsave(G,1,0,targets)
+        print(len(ans))
+        print(len(G.nodes))
+       
+        assert len(ans) <= len(G.nodes)
+    
+    print("All tests have passed!")
 
-    # for graph_key, graph in graphs.items():
-    #     print(f"\nGraph {graph_key}:")
-    #     print("Nodes:", graph.nodes())
-    #     print("Edges:", graph.edges())       
+
+if __name__ == "__main__":
+    random_graph_test()
