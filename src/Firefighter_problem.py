@@ -3,7 +3,10 @@ import networkx.algorithms.connectivity as algo
 import math
 import json
 
-from Utils import *
+# TODO: fix this shit, when we run tests needs src.Utils, and when we run this, we need Utils only..
+
+from src.Utils import *
+# from Utils import *
 
 # TODO: make simple examples on how the algorithm works (maybe 2-3 nodes)
 
@@ -19,6 +22,7 @@ G3 = nx.Digraph  G3.add_nodes_from([0,1,2,3,4,5])
 G3.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,5),(4,5)])
 """
 
+# TODO: add a stopping condition in case the nodes are vaccinated and we have more iterations to go.
 def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) -> list:
     """
     "Approximability of the Firefighter Problem - Computing Cuts over Time",
@@ -164,9 +168,11 @@ if __name__ == "__main__":
         json_data = json.load(file)
     graphs = parse_json_to_networkx(json_data)
     G1 = graphs["Dirlay_Graph-1"]
-    G2 = graphs["RegularGraph_Graph-1"]
+    G2 = graphs["RegularGraph_Graph-2"]
+    # display_graph(G2)
+    spreading_minbudget(G2,0,[1,3,4,5,6])
 
-    for graph_key, graph in graphs.items():
-        print(f"\nGraph {graph_key}:")
-        print("Nodes:", graph.nodes())
-        print("Edges:", graph.edges())       
+    # for graph_key, graph in graphs.items():
+    #     print(f"\nGraph {graph_key}:")
+    #     print("Nodes:", graph.nodes())
+    #     print("Edges:", graph.edges())       
