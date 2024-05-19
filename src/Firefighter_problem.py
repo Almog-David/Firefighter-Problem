@@ -12,7 +12,7 @@ from src.Utils import *
 
 
 # TODO: add a stopping condition in case the nodes are vaccinated and we have more iterations to go.
-def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, flag=False) -> list:
+def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, flag=None) -> list:
     """
     "Approximability of the Firefighter Problem - Computing Cuts over Time",
     by Elliot Anshelevich, Deeparnab Chakrabarty, Ameya Hate, Chaitanya Swamy (2010)
@@ -75,7 +75,7 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, fl
                 vaccinated_nodes.append(chosen_node)
         can_spread = spread_virus(Graph,infected_nodes)
         
-        if flag:
+        if flag is not None:
             # only for min budget - a stoping condition in case we saved all nodes or one of the target nodes in infected 
             if len(targets)==0 or any(node in infected_nodes for node in targets):
                 return vaccination_strategy
