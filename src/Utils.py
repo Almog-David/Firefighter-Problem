@@ -84,8 +84,8 @@ def calculate_gamma(graph:nx.DiGraph, source:int, targets:list)-> dict:
             if node in targets:
                 direct_vaccination[strategy].append(node)
     
-    print("Gamma is: " + str(gamma))
-    print("S(u,t) is: " + str(direct_vaccination))
+    #print("Gamma is: " + str(gamma))
+    #print("S(u,t) is: " + str(direct_vaccination))
     return gamma, direct_vaccination
 
 def calculate_epsilon(direct_vaccinations:dict)->list:
@@ -116,7 +116,7 @@ def calculate_epsilon(direct_vaccinations:dict)->list:
     if current_group:
         epsilon.append(current_group)
     
-    print("Epsilon is: " + str(epsilon))
+    #print("Epsilon is: " + str(epsilon))
     return epsilon
 
 def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, current_time_options:list, targets:list)->tuple:
@@ -148,8 +148,8 @@ def find_best_direct_vaccination(graph:nx.DiGraph, direct_vaccinations:dict, cur
     if nodes_saved is not None:
         targets[:] = [element for element in targets if element not in nodes_saved]
     
-    if best_vaccination != ():
-        print("The best direct vaccination is: " + str(best_vaccination) + " and it's saves nodes: " + str(nodes_saved))
+    #if best_vaccination != ():
+       # print("The best direct vaccination is: " + str(best_vaccination) + " and it's saves nodes: " + str(nodes_saved))
     return best_vaccination
 
 def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
