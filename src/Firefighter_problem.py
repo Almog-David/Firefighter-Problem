@@ -10,20 +10,9 @@ from src.Utils import *
 
 # TODO: make simple examples on how the algorithm works (maybe 2-3 nodes)
 
-"""
-Examples of graphs that we will use in the following runing examples:
-G1 = nx.Digraph  G1.add_nodes_from([0,1,2,3,4,5,6])
-G1.add_edges_from([(0,1),(0,2),(1,2),(1,4),(2,3),(2,6),(3,5)])
-
-G2 = nx.Digraph  G2.add_nodes_from([0,1,2,3,4,5,6,7,8])
-G2.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
-
-G3 = nx.Digraph  G3.add_nodes_from([0,1,2,3,4,5])
-G3.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,5),(4,5)])
-"""
 
 # TODO: add a stopping condition in case the nodes are vaccinated and we have more iterations to go.
-def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) -> list:
+def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, flag=False) -> list:
     """
     "Approximability of the Firefighter Problem - Computing Cuts over Time",
     by Elliot Anshelevich, Deeparnab Chakrabarty, Ameya Hate, Chaitanya Swamy (2010)
@@ -34,12 +23,32 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
     spreading_maxsave: Gets a directed graph, budget, source node, and list of targeted nodes that we need to save
     and return the best vaccination strategy that saves the most nodes from the targeted nodes list.
     
-    Example1:
-    >>> spreading_maxsave(G1,1,0,G1.nodes())
-    [(1,1),(6,2)]
+    Example 1:
+    >>> G = nx.DiGraph()
+    >>> G.add_nodes_from([0,1,2], status="target")
+    >>> G.add_edges_from([(0,1),(0,2),(1,2)])
+    >>> spreading_maxsave(G,1,0,[1,2])
+    [(1,1)]
 
-    Example2:
-    >>> spreading_maxsave(G2,2,0,G2.nodes())
+    Example 2:
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_nodes_from([0,1,2,3], status="target")
+    >>> G1.add_edges_from([(0,1),(0,2),(1,2),(1,3),(2,3)])
+    >>> spreading_maxsave(G1,1,0,[1,2,3])
+    [(1,1)]
+
+    Example 3:
+    >>> G2 = nx.DiGraph()
+    >>> G2.add_nodes_from([0,1,2,3,4,5,6], status="target")
+    >>> G2.add_edges_from([(0,1),(0,2),(1,2),(1,4),(2,3),(2,6),(3,5)])
+    >>> spreading_maxsave(G2,1,0,[1,2,3,4,5,6])
+    [(2,1),(4,2)]
+
+    Example 4:
+    >>> G3 = nx.DiGraph() 
+    >>> G3.add_nodes_from([0,1,2,3,4,5,6,7,8], status="target")
+    >>> G3.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
+    >>> spreading_maxsave(G3,2,0,[1,2,3,4,5,6,7,8])
     [(5,1),(2,1),(8,2)]
     """
     if budget < 1:
@@ -52,7 +61,6 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
     can_spread = True
     Graph.nodes[source]['status'] = 'infected'
     infected_nodes.append(source)
-    #display_graph(Graph)
     gamma, direct_vaccinations = calculate_gamma(Graph, source, targets)
     epsilon = calculate_epsilon(direct_vaccinations)
     time_step = 0
@@ -66,6 +74,12 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list) ->
                 vaccinate_node(Graph, chosen_node)
                 vaccinated_nodes.append(chosen_node)
         can_spread = spread_virus(Graph,infected_nodes)
+        
+        if flag:
+            # only for min budget - a stoping condition in case we saved all nodes or one of the target nodes in infected 
+            if len(targets)==0 or any(node in infected_nodes for node in targets):
+                return vaccination_strategy
+        
         time_step = time_step + 1
     
     clean_graph(Graph)
@@ -82,12 +96,32 @@ def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
     spreading_minbudget: Gets a directed graph, source node, and list of targeted nodes that we need to save
     and returns the minimum budget that saves all the nodes from the targeted nodes list.
 
-    Example1:
-    >>> spreading_minbudget(G2,0,[2,6,1,8])
+     Example 1: 
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_nodes_from([0,1,2,3], status="target")
+    >>> G1.add_edges_from([(0,1),(0,2),(1,2),(1,3),(2,3)])
+    >>> spreading_minbudget(G1,0,[1,2,3])
     2
 
-    Example2:
-    >>> spreading_minbudget(G2,0,G2.nodes())
+    Example 2: 
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_nodes_from([0,1,2,3], status="target")
+    >>> G1.add_edges_from([(0,1),(0,2),(1,2),(1,3),(2,3)])
+    >>> spreading_minbudget(G1,0,[1,3])
+    1
+
+    Example 3:
+    >>> G2 = nx.DiGraph()
+    >>> G2.add_nodes_from([0,1,2,3,4,5,6], status="target")
+    >>> G2.add_edges_from([(0,1),(0,2),(1,2),(1,4),(2,3),(2,6),(3,5)])
+    >>> spreading_minbudget(G2,0,[1,2,3,4,5,6])
+    2
+
+    Example 4:
+    >>> G3 = nx.DiGraph() 
+    >>> G3.add_nodes_from([0,1,2,3,4,5,6,7,8], status="target")
+    >>> G3.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
+    >>> spreading_minbudget(G3,2,0,[1,2,3,4,5,6,7,8])
     3
     """
     validate_parameters(Graph,source,targets)
@@ -98,7 +132,7 @@ def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
     middle = math.floor((min_value + max_value) / 2)
 
     while min_value < max_value:
-        strategy = spreading_maxsave(Graph, middle, source, targets)
+        strategy = spreading_maxsave(Graph, middle, source, targets,True)
         nodes_saved = set()
 
         for option in strategy:
@@ -128,13 +162,33 @@ def non_spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)->int:
     non_spreading_minbudget: Gets a directed graph, source node, and list of targeted nodes that we need to save
     and returns the minimum budget that saves all the nodes from the targeted nodes list.
     
-    Example1:
-    >>> non_spreading_minbudget(G2,0,[2,6,1,8])
-    3
-
-    Example2:
-    >>> non_spreading_minbudget(G1,0,G1.nodes())
+    Example1: 
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_nodes_from([0,1,2,3], status="target")
+    >>> G1.add_edges_from([(0,1),(0,2),(1,2),(1,3),(2,3)])
+    >>> non_spreading_minbudget(G1,0,[1,3])
     2
+
+    Example 2: 
+    >>> G1 = nx.DiGraph()
+    >>> G1.add_nodes_from([0,1,2,3], status="target")
+    >>> G1.add_edges_from([(0,1),(0,2),(1,2),(1,3),(2,3)])
+    >>> non_spreading_minbudget(G1,0,[1,2,3])
+    2
+
+    Example 3:
+    >>> G2 = nx.DiGraph()
+    >>> G2.add_nodes_from([0,1,2,3,4,5,6], status="target")
+    >>> G2.add_edges_from([(0,1),(0,2),(1,2),(1,4),(2,3),(2,6),(3,5)])
+    >>> non_spreading_minbudget(G2,0,[1,2,3,4,5,6])
+    2
+
+    Example 4:
+    >>> G3 = nx.DiGraph() 
+    >>> G3.add_nodes_from([0,1,2,3,4,5,6,7,8], status="target")
+    >>> G3.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
+    >>> non_spreading_minbudget(G3,0,[2,6,1,8])
+    3
     """
     validate_parameters(Graph,source,targets)
     G = create_st_graph(Graph,targets)
@@ -150,8 +204,12 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
 
     non_spreading_dirlaynet_minbudget: Gets a directed graph, source node, and list of targeted nodes that we need to save
     and returns the minimum budget that saves all the nodes from the targeted nodes list.
+    
     Example1:
-    >>> non_spreading__dirlaynet_minbudget(G3,0,[1,2,3,4,5])
+    >>> G4 = nx.DiGraph()
+    >>> G4.add_nodes_from([0,1,2,3,4,5], status="target")
+    >>> G4.add_edges_from([(0,1),(0,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,5),(4,5)])
+    >>> non_spreading_dirlaynet_minbudget(G4,0,[1,2,3,4,5])
     2
     """
     validate_parameters(Graph,source,targets)
