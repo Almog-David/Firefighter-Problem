@@ -6,8 +6,8 @@ import random
 
 # TODO: fix this shit, when we run tests needs src.Utils, and when we run this, we need Utils only..
 
-#from src.Utils import *
-from Utils import *
+from src.Utils import *
+# from Utils import *
 
 def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, flag=None) -> list:
     """
