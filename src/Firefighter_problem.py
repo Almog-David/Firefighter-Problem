@@ -7,7 +7,7 @@ import random
 # TODO: fix this shit, when we run tests needs src.Utils, and when we run this, we need Utils only..
 
 from src.Utils import *
-# from Utils import *
+#from Utils import *
 
 def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, flag=None) -> list:
     """
@@ -25,28 +25,28 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, fl
     >>> G.add_nodes_from([0,1,2], status="target")
     >>> G.add_edges_from([(0,1),(0,2),(1,2)])
     >>> spreading_maxsave(G,1,0,[1,2])
-    [(1,1)]
+    [(1, 1)]
 
     Example 2:
     >>> G1 = nx.DiGraph()
     >>> G1.add_nodes_from([0,1,2,3], status="target")
     >>> G1.add_edges_from([(0,1),(0,2),(1,2),(1,3),(2,3)])
     >>> spreading_maxsave(G1,1,0,[1,2,3])
-    [(1,1)]
+    [(1, 1)]
 
     Example 3:
     >>> G2 = nx.DiGraph()
     >>> G2.add_nodes_from([0,1,2,3,4,5,6], status="target")
     >>> G2.add_edges_from([(0,1),(0,2),(1,2),(1,4),(2,3),(2,6),(3,5)])
     >>> spreading_maxsave(G2,1,0,[1,2,3,4,5,6])
-    [(2,1),(4,2)]
+    [(2, 1), (4, 2)]
 
     Example 4:
     >>> G3 = nx.DiGraph() 
     >>> G3.add_nodes_from([0,1,2,3,4,5,6,7,8], status="target")
     >>> G3.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
     >>> spreading_maxsave(G3,2,0,[1,2,3,4,5,6,7,8])
-    [(5,1),(2,1),(8,2)]
+    [(5, 1), (2, 1), (8, 2)]
     """
     if budget < 1:
         raise ValueError("Error: The budget must be at least 1")
@@ -75,6 +75,7 @@ def spreading_maxsave(Graph:nx.DiGraph, budget:int, source:int, targets:list, fl
         if flag is not None:
             # only for min budget - a stoping condition in case we saved all nodes or one of the target nodes in infected 
             if len(targets)==0 or any(node in infected_nodes for node in targets):
+                clean_graph(Graph)
                 return vaccination_strategy
         
         time_step = time_step + 1
@@ -118,7 +119,7 @@ def spreading_minbudget(Graph:nx.DiGraph, source:int, targets:list)-> int:
     >>> G3 = nx.DiGraph() 
     >>> G3.add_nodes_from([0,1,2,3,4,5,6,7,8], status="target")
     >>> G3.add_edges_from([(0,2),(0,4),(0,5),(2,1),(2,3),(4,1),(4,6),(5,3),(5,6),(5,7),(6,7),(6,8),(7,8)])
-    >>> spreading_minbudget(G3,2,0,[1,2,3,4,5,6,7,8])
+    >>> spreading_minbudget(G3,0,[1,2,3,4,5,6,7,8])
     3
     """
     validate_parameters(Graph,source,targets)
@@ -218,34 +219,6 @@ def non_spreading_dirlaynet_minbudget(Graph:nx.DiGraph, source:int, targets:list
     min_budget = min_budget_calculation(vacc_matrix)
     return min_budget
 
-def random_graph_test():
-    for i in range(10):
-        num_nodes = random.randint(2,100)
-        nodes = list(range(num_nodes+1))
-        num_edges = 1000
-        save_amount = random.randint(1,num_nodes)
-        targets = []
-        G = nx.DiGraph()
-        
-        G.add_nodes_from(nodes, status="target")
-        for _ in range(num_edges):
-            source = random.randint(0, num_nodes - 1)
-            target = random.randint(0, num_nodes - 1)
-            if source != target:  # Ensure no self-loops
-                G.add_edge(source, target)
-        for node in range(save_amount):
-            probability = random.random()
-            if probability < 0.75 and node!=0:
-                targets.append(node)
-        
-        ans = spreading_maxsave(G,1,0,targets)
-        print(len(ans))
-        print(len(G.nodes))
-       
-        assert len(ans) <= len(G.nodes)
-    
-    print("All tests have passed!")
-
-
 if __name__ == "__main__":
-    random_graph_test()
+    import doctest
+    doctest.testmod(verbose=True)

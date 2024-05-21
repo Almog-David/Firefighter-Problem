@@ -218,7 +218,6 @@ def test_save_subgroup_vertices(graph_key, budget, source, targets, expected_str
     
     assert calculated_strategy == expected_strategy
 
-    # TODO : add tests on big graphs (100 nodes) - sanity checks only.
 def random_graph_test():
     for i in range(10):
         num_nodes = random.randint(2,100)
@@ -239,8 +238,9 @@ def random_graph_test():
             if probability < 0.75 and node!=0:
                 targets.append(node)
         
-        ans = spreading_maxsave(G,0,1,targets)
-        print(ans)
+        ans = spreading_maxsave(G,1,0,targets)
+        print(len(ans))
+        print(len(G.nodes))
        
         assert len(ans) <= len(G.nodes)
     
