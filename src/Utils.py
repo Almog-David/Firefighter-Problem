@@ -172,7 +172,7 @@ def spread_virus(graph:nx.DiGraph, infected_nodes:list)->bool:
     infected_nodes.clear()
     for node in new_infected_nodes:
         infected_nodes.append(node)  
-    #display_graph(graph)
+    display_graph(graph)
     return bool(infected_nodes)
 
 def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
@@ -192,7 +192,7 @@ def spread_vaccination(graph:nx.DiGraph, vaccinated_nodes:list)->None:
     vaccinated_nodes.clear()
     for node in new_vaccinated_nodes:
         vaccinated_nodes.append(node) 
-    #display_graph(graph)              
+    display_graph(graph)              
     return
 
 def vaccinate_node(graph:nx.DiGraph, node:int)->None:
@@ -204,7 +204,7 @@ def vaccinate_node(graph:nx.DiGraph, node:int)->None:
     - node (int): Node to be vaccinated.
     """
     graph.nodes[node]['status'] = 'directly vaccinated'
-    #display_graph(graph)
+    display_graph(graph)
     return
 
 def clean_graph(graph:nx.DiGraph)->None:
@@ -239,7 +239,7 @@ def adjust_nodes_capacity(graph:nx.DiGraph, source:int)->list:
     for index in range(1,len(layers)):
         for node in layers[index]:
             graph.nodes[node]['capacity'] = 1/(index*harmonic_sum)
-    print("Layers: ", layers)       
+    #print("Layers: ", layers)       
     return layers
 
 def create_st_graph(graph:nx.DiGraph, targets:list)->nx.DiGraph:
@@ -311,19 +311,18 @@ def calculate_vaccine_matrix(layers:list, min_cut_nodes:list)->np.matrix:
     - matrix (np.matrix): Vaccine matrix.
     """
     nodes_list = [] # = N_i 
-    print(layers, min_cut_nodes)
+    #print(layers, min_cut_nodes)
     for i in range(1,len(layers)):
         common_elements = set(min_cut_nodes) & set(layers[i])
         nodes_list.append(common_elements)
-    print(nodes_list)
+    #print(nodes_list)
     matrix = np.zeros((len(layers)-1, len(layers)-1))
     for i in range (len(layers)-1):
         for j in range(i, len(layers)-1):
             matrix[i][j] = ((len(nodes_list[j])/(j+1))) # here we can chose ceil or floor.
-    print(matrix)
+    #print(matrix)
     return matrix
     
-
 def matrix_to_integers_values(matrix:np.matrix) -> np.matrix: #TODO: THIS 
     """
     Convert matrix values to integers.
@@ -352,10 +351,53 @@ def min_budget_calculation(matrix:np.matrix) -> int :
     row_sum = [0]*matrix_size
     for i in range(matrix_size):
         for j in range(matrix_size):
-            print(matrix[i][j])
+            #print(matrix[i][j])
             row_sum[i] += matrix[i][j]
-    print(row_sum)
+    #print(row_sum)
     return int(max(row_sum))
+
+"Heuristic approach:"
+
+def find_best_neighbor(graph:nx.DiGraph, infected_nodes:list, targets:list)->int:
+    """
+    Find the best node from the infected nodes successors that saves more new node in targets.
+
+    Parameters:
+    - graph (nx.DiGraph): Directed graph.
+    - infected_nodes (list): list of all infected nodes that threaten to infect additional nodes.
+    - targets (list): List of target nodes.
+
+    Returns:
+    - best_node (int): Best node option.
+    """
+    best_node = None
+    nodes_saved = []
+    max_number = -1
+    optional_nodes = set()
+
+    # Go through the infected_nodes list and collect all their neighbors
+    for node in infected_nodes:
+        optional_nodes.update(graph.neighbors(node))
+
+    for node in optional_nodes:
+        if graph.nodes[node]['status'] == 'target':
+            nodes_list = list(graph.neighbors(node))
+            if node in targets:
+                nodes_list.append(node)
+            common_elements = set(nodes_list) & set(targets)
+            if len(common_elements) > max_number:
+                best_node = node
+                nodes_saved = common_elements
+                max_number = len(common_elements)
+
+    if nodes_saved is not None:
+        targets[:] = [element for element in targets if element not in nodes_saved]
+
+    #if best_node != None:
+    # print("The best node is: " + node + " and it's saves nodes: " + str(nodes_saved))
+    return best_node
+
+"Usefull Utils:"
 
 def display_graph(graph:nx.DiGraph)->None:
     """

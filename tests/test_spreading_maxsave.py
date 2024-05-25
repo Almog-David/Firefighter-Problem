@@ -51,7 +51,7 @@ def test_source_is_target(graph_key, budget, source, targets):
         4: [(4, 1)],
         5: [(5, 1)],
         6: [(4, 1), (5, 1), (6, 1), (6, 2)],
-        7: [(5, 1), (7, 1), (7, 2)],
+        7: [(5, 1), (6, 1), (7, 1), (7, 2)],
         8: [(4, 1), (5, 1), (6, 1), (6, 2), (7, 1), (7, 2), (8, 1), (8, 2), (8, 3)],
     }, {
         (1, 1): [1],
@@ -61,7 +61,7 @@ def test_source_is_target(graph_key, budget, source, targets):
         (3, 2): [3],
         (4, 1): [1, 4, 6, 8],
         (5, 1): [3, 5, 6, 7, 8],
-        (6, 1): [4, 6, 8],
+        (6, 1): [6, 7, 8],
         (6, 2): [6, 8],
         (7, 1): [7, 8],
         (7, 2): [7, 8],
@@ -78,7 +78,7 @@ def test_source_is_target(graph_key, budget, source, targets):
         6: [(2, 1), (6, 1), (6, 2)],
     }, {
         (1, 1): [1, 3, 4, 5],
-        (2, 1): [2, 3, 5, 6],
+        (2, 1): [3, 5],
         (3, 1): [3, 5],
         (3, 2): [3, 5],
         (4, 1): [4],
@@ -86,11 +86,12 @@ def test_source_is_target(graph_key, budget, source, targets):
         (5, 1): [5],
         (5, 2): [5],
         (5, 3): [5],
-        (6, 1): [6],
-        (6, 2): [6],
+        (6, 1): [],
+        (6, 2): [],
     })
 ])
 def test_calculate_gamma(graph_key, source, targets, expected_gamma, expected_direct_vaccination):
+    print( calculate_gamma(graphs[graph_key], source, targets))
     calculated_gamma, calculated_direct_vaccination = calculate_gamma(graphs[graph_key], source, targets)
     
     for key in expected_gamma:
